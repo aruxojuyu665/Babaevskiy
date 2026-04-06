@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SectionDivider } from "@/components/SectionDivider";
 import { Hero } from "@/sections/Hero";
 import { TrustBar } from "@/sections/TrustBar";
 import { Transformation } from "@/sections/Transformation";
@@ -21,11 +22,16 @@ export default function Home() {
         <TrustBar />
         <Transformation />
         <Services />
+        <SectionDivider />
         <Pricing />
+        <SectionDivider variant="stitch" />
         <Cases />
+        <SectionDivider />
         <Process />
         <About />
+        <SectionDivider variant="stitch" />
         <Reviews />
+        <SectionDivider />
         <Calculator />
         <Contacts />
       </main>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { MagneticButton } from "@/components/MagneticButton";
@@ -11,7 +12,6 @@ export function Hero() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    // GSAP staggered reveal
     async function animate() {
       const gsap = (await import("gsap")).default;
       const ctx = gsap.context(() => {
@@ -55,33 +55,48 @@ export function Hero() {
       ref={sectionRef}
       className="relative flex min-h-screen items-center justify-center overflow-hidden"
     >
-      {/* Background — placeholder gradient until real photo */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[var(--bg-surface)] via-[var(--bg-primary)] to-[var(--bg-elevated)]" />
-      {/* Workshop photo placeholder */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: "url(/process/workshop-hero.jpg)" }}
+      {/* Background image */}
+      <Image
+        src="/process/workshop-hero.jpg"
+        alt="Мастерская"
+        fill
+        className="object-cover"
+        priority
+        quality={85}
       />
-      {/* Warm overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/60 to-transparent" />
+
+      {/* Warm overlay gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/80 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/90" />
+
+      {/* Floating decorative elements */}
+      <div className="absolute top-20 left-10 h-32 w-32 animate-[float_6s_ease-in-out_infinite] rounded-full bg-[var(--color-primary)]/[0.06] blur-2xl" />
+      <div className="absolute bottom-40 right-10 h-40 w-40 animate-[float_8s_ease-in-out_infinite_1s] rounded-full bg-[var(--color-accent)]/[0.06] blur-2xl" />
+      <div className="absolute top-1/3 right-1/4 h-24 w-24 animate-[float_7s_ease-in-out_infinite_2s] rounded-full bg-[var(--color-warm)]/[0.05] blur-xl" />
+
+      {/* Corner ornaments */}
+      <div className="absolute top-8 left-8 z-10 h-16 w-16 border-t border-l border-[var(--color-accent)]/20" />
+      <div className="absolute top-8 right-8 z-10 h-16 w-16 border-t border-r border-[var(--color-accent)]/20" />
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 text-center md:px-8">
-        {/* Tagline */}
-        <p
-          data-hero-animate
-          className="mb-4 font-accent text-lg italic text-[var(--color-primary)] md:text-xl"
-        >
-          Мастерская ручной работы
-        </p>
+        {/* Tagline with decorative elements */}
+        <div data-hero-animate className="mx-auto mb-4 flex items-center justify-center gap-3">
+          <div className="h-px w-8 bg-[var(--color-accent)]/50" />
+          <p className="font-accent text-lg italic text-[var(--color-primary)] md:text-xl">
+            Мастерская ручной работы
+          </p>
+          <div className="h-px w-8 bg-[var(--color-accent)]/50" />
+        </div>
 
         {/* Title */}
         <h1
           data-hero-animate
-          className="font-serif text-4xl font-bold leading-tight text-[var(--text-primary)] md:text-6xl lg:text-7xl"
+          className="font-serif text-5xl font-bold leading-tight text-[var(--text-primary)] md:text-7xl lg:text-8xl"
         >
           Бабаевская
           <br />
-          <span className="text-[var(--color-primary)]">мастерская</span>
+          <span className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] bg-clip-text text-transparent">
+            мастерская
+          </span>
         </h1>
 
         {/* Subtitle */}
@@ -94,21 +109,26 @@ export function Hero() {
           Один мастер — одно изделие. Опыт от 6 до 30 лет.
         </p>
 
-        {/* CTA */}
+        {/* CTA Buttons */}
         <div data-hero-animate className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <MagneticButton
             onClick={() => {
               document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-medium text-white shadow-[var(--shadow-warm)] transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)]"
+            className="group relative overflow-hidden rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-medium text-white shadow-[var(--shadow-warm)] transition-all hover:shadow-[var(--shadow-warm-lg)]"
           >
-            Рассчитать стоимость
+            {/* Button shine effect */}
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            <span className="relative">Рассчитать стоимость</span>
           </MagneticButton>
           <a
             href={BUSINESS.phoneHref}
-            className="flex items-center gap-2 rounded-full border-2 border-[var(--border)] px-8 py-4 text-base font-medium text-[var(--text-primary)] transition-all hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+            className="flex items-center gap-2 rounded-full border-2 border-[var(--border)] px-8 py-4 text-base font-medium text-[var(--text-primary)] transition-all hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-warm-sm)]"
           >
-            <PhoneIcon />
+            <span className="relative flex h-3 w-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-40" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-[var(--color-primary)]" />
+            </span>
             {BUSINESS.phone}
           </a>
         </div>
@@ -116,9 +136,11 @@ export function Hero() {
         {/* Mini callback form */}
         <div data-hero-animate className="mt-12">
           {submitted ? (
-            <p className="text-base font-medium text-[var(--color-primary)]">
-              Спасибо! Перезвоним в ближайшее время.
-            </p>
+            <div className="mx-auto max-w-md rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--bg-surface)]/80 p-4 backdrop-blur">
+              <p className="text-base font-medium text-[var(--color-primary)]">
+                Спасибо! Перезвоним в ближайшее время.
+              </p>
+            </div>
           ) : (
             <form
               onSubmit={handleSubmit}
@@ -129,7 +151,7 @@ export function Hero() {
                 value={phone}
                 onChange={handlePhoneChange}
                 placeholder="+7 (___) ___-__-__"
-                className="w-full rounded-full border border-[var(--border)] bg-white/80 px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none backdrop-blur transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
+                className="w-full rounded-full border border-[var(--border)] bg-white/70 px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none backdrop-blur transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
                 maxLength={18}
               />
               <button
@@ -143,20 +165,15 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Scroll hint */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[var(--text-muted)]">
-          <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+      {/* Scroll hint with animation */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs tracking-widest uppercase text-[var(--text-muted)]">листайте</span>
+          <div className="h-10 w-6 rounded-full border-2 border-[var(--text-muted)]/30 p-1">
+            <div className="h-2 w-full animate-bounce rounded-full bg-[var(--color-primary)]" />
+          </div>
+        </div>
       </div>
     </section>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-    </svg>
   );
 }

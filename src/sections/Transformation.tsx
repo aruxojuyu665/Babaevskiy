@@ -1,140 +1,139 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ScrollVideoPlayer } from "@/components/ScrollVideoPlayer";
-
-const FRAME_COUNT = 121;
-const FRAMES_PATH = "/frames";
-
-const SCROLL_TEXTS = [
-  "Старая обивка? Не проблема.",
-  "Разберём до каркаса",
-  "Оденем в новую ткань",
-  "Как новый. С гарантией.",
-];
 
 export function Transformation() {
-  const [isMobile, setIsMobile] = useState(false);
-  const mobileRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
 
+  // Play video when in viewport
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
   }, []);
 
-  if (isMobile) {
-    return <MobileTransformation ref={mobileRef} />;
-  }
-
-  return <DesktopTransformation />;
-}
-
-/* ─── Desktop: Canvas scroll-driven ─── */
-function DesktopTransformation() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
+  // Track video progress for text reveals
   useEffect(() => {
-    async function setupTextAnimations() {
-      const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
+    const video = videoRef.current;
+    if (!video) return;
 
-      const ctx = gsap.context(() => {
-        const texts = sectionRef.current?.querySelectorAll("[data-transform-text]");
-        texts?.forEach((text, i) => {
-          const start = i * 25;
-          const end = start + 18;
-
-          gsap.fromTo(
-            text,
-            { y: 40, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: `${start}% top`,
-                end: `${end}% top`,
-                scrub: 1,
-              },
-            }
-          );
-
-          if (i < 3) {
-            gsap.to(text, {
-              opacity: 0,
-              y: -30,
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: `${end + 2}% top`,
-                end: `${end + 7}% top`,
-                scrub: 1,
-              },
-            });
-          }
-        });
-      }, sectionRef);
-
-      return () => ctx.revert();
+    function onTimeUpdate() {
+      if (video!.duration) {
+        setVideoProgress(video!.currentTime / video!.duration);
+      }
     }
 
-    setupTextAnimations();
+    video.addEventListener("timeupdate", onTimeUpdate);
+    return () => video.removeEventListener("timeupdate", onTimeUpdate);
   }, []);
 
-  return (
-    <div ref={sectionRef} className="relative">
-      {/* Canvas scroll player — occupies 400vh */}
-      <ScrollVideoPlayer frameCount={FRAME_COUNT} framesPath={FRAMES_PATH} />
+  // Determine which text to show based on video progress
+  const activeText =
+    videoProgress < 0.25 ? 0 :
+    videoProgress < 0.5 ? 1 :
+    videoProgress < 0.75 ? 2 : 3;
 
-      {/* Text overlays — positioned absolutely over the sticky canvas */}
-      <div className="pointer-events-none absolute inset-0">
-        {SCROLL_TEXTS.map((text, i) => (
-          <div
-            key={i}
-            data-transform-text
-            className="sticky top-0 flex h-screen items-center justify-center opacity-0"
-          >
-            <div className="text-center px-4">
-              <div className="mx-auto mb-4 w-16 stitch-divider" />
-              <h2 className="font-serif text-3xl font-bold text-white drop-shadow-lg md:text-5xl lg:text-6xl">
-                {text}
-              </h2>
-            </div>
+  const TEXTS = [
+    { main: "Старая обивка?", sub: "Не проблема" },
+    { main: "Разберём", sub: "до каркаса" },
+    { main: "Оденем", sub: "в новую ткань" },
+    { main: "Как новый", sub: "С гарантией" },
+  ];
+
+  return (
+    <section ref={sectionRef} className="relative overflow-hidden bg-[#1a120b]">
+      {/* Decorative corner ornaments */}
+      <div className="absolute top-6 left-6 z-20 h-12 w-12 border-t-2 border-l-2 border-[var(--color-accent)]/30" />
+      <div className="absolute top-6 right-6 z-20 h-12 w-12 border-t-2 border-r-2 border-[var(--color-accent)]/30" />
+      <div className="absolute bottom-6 left-6 z-20 h-12 w-12 border-b-2 border-l-2 border-[var(--color-accent)]/30" />
+      <div className="absolute bottom-6 right-6 z-20 h-12 w-12 border-b-2 border-r-2 border-[var(--color-accent)]/30" />
+
+      <div className="relative aspect-[16/9] max-h-[85vh] w-full md:aspect-auto md:h-[85vh]">
+        {/* Video */}
+        <video
+          ref={videoRef}
+          src="/video/sofa-transform.mp4"
+          muted
+          playsInline
+          loop
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+        {/* Dark cinematic overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a120b] via-[#1a120b]/30 to-[#1a120b]/50" />
+
+        {/* Animated text overlays */}
+        <div className="absolute inset-0 flex items-center justify-center px-4">
+          <div className="text-center">
+            {TEXTS.map((text, i) => (
+              <div
+                key={i}
+                className="absolute inset-0 flex items-center justify-center transition-all duration-700"
+                style={{
+                  opacity: activeText === i ? 1 : 0,
+                  transform: activeText === i ? "translateY(0)" : "translateY(20px)",
+                }}
+              >
+                <div>
+                  {/* Decorative line */}
+                  <div className="mx-auto mb-6 flex items-center justify-center gap-3">
+                    <div className="h-px w-8 bg-[var(--color-accent)]/50" />
+                    <div className="h-1.5 w-1.5 rotate-45 bg-[var(--color-accent)]" />
+                    <div className="h-px w-8 bg-[var(--color-accent)]/50" />
+                  </div>
+                  <h2 className="font-serif text-4xl font-bold text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+                    {text.main}
+                  </h2>
+                  <p className="mt-2 font-accent text-xl italic text-[var(--color-accent)] md:text-3xl">
+                    {text.sub}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+        </div>
 
-/* ─── Mobile: Autoplay video ─── */
-import { forwardRef } from "react";
+        {/* Progress bar */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 h-1 bg-white/10">
+          <div
+            className="h-full bg-[var(--color-primary)] transition-all duration-300"
+            style={{ width: `${videoProgress * 100}%` }}
+          />
+        </div>
 
-const MobileTransformation = forwardRef<HTMLElement>(function MobileTransformation(_, ref) {
-  return (
-    <section ref={ref} className="relative aspect-video w-full overflow-hidden">
-      <video
-        src="/video/sofa-transform.mp4"
-        muted
-        autoPlay
-        loop
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/30 via-transparent to-[var(--bg-primary)]/60" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center px-6">
-          <div className="mx-auto mb-3 w-12 stitch-divider" />
-          <h2 className="font-serif text-2xl font-bold text-white drop-shadow-lg sm:text-3xl">
-            Как новый.
-            <br />
-            С гарантией.
-          </h2>
+        {/* Step indicators */}
+        <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-3">
+          {TEXTS.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 rounded-full transition-all duration-500 ${
+                i === activeText ? "w-8 bg-[var(--color-primary)]" : "w-2 bg-white/30"
+              }`}
+            />
+          ))}
         </div>
       </div>
+
+      {/* Bottom fade to next section */}
+      <div className="h-16 bg-gradient-to-b from-[#1a120b] to-[var(--bg-primary)]" />
     </section>
   );
-});
+}
