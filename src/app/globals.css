@@ -221,6 +221,67 @@ html.lenis body {
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
+/* ===== Vintage photo filter ===== */
+.vintage-photo {
+  filter: sepia(15%) contrast(1.05) brightness(0.97) saturate(0.9);
+}
+
+/* ===== Warm shimmer skeleton ===== */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-elevated) 50%, var(--bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+/* ===== CSS @starting-style for entry animations ===== */
+@supports (selector(:starting-style)) {
+  .animate-entry {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition-behavior: allow-discrete;
+  }
+  .animate-entry:starting-style {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ===== CSS Masonry layout ===== */
+@supports (grid-template-rows: masonry) {
+  .masonry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-rows: masonry;
+    gap: 1rem;
+  }
+}
+
+/* ===== Spring-toggle switch ===== */
+.spring-toggle {
+  width: 48px;
+  height: 26px;
+  border-radius: 9999px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.spring-toggle.active {
+  background: var(--color-primary);
+}
+
+.spring-toggle-knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  box-shadow: var(--shadow-warm-sm);
+}
+
 /* ===== Float animation ===== */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

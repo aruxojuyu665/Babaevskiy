@@ -1,6 +1,7 @@
 "use client";
 
 import { BUSINESS, NAV_LINKS } from "@/lib/constants";
+import { SoundToggle } from "@/components/SoundManager";
 
 export function Footer() {
   return (
@@ -69,8 +70,9 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 border-t border-white/10 pt-6 text-center text-xs opacity-40">
+        <div className="mt-12 flex items-center justify-between border-t border-white/10 pt-6 text-xs opacity-40">
           <p>© {new Date().getFullYear()} {BUSINESS.name}. Все права защищены.</p>
+          <SoundToggle />
         </div>
       </div>
     </footer>

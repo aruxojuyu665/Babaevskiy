@@ -61,7 +61,7 @@ export function About() {
               src="/process/workshop-wide.jpg"
               alt="Мастерская Бабаевская"
               fill
-              className="object-cover ken-burns"
+              className="object-cover ken-burns vintage-photo"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--text-primary)]/20 to-transparent" />

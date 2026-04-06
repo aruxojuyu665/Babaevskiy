@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 interface MagneticButtonProps {
   children: React.ReactNode;
@@ -20,33 +21,41 @@ export function MagneticButton({
   strength = 0.3,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLElement>(null);
-  const [transform, setTransform] = useState("translate(0px, 0px)");
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
 
   function handleMouseMove(e: React.MouseEvent) {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    setTransform(`translate(${x * strength}px, ${y * strength}px)`);
+    const dx = e.clientX - rect.left - rect.width / 2;
+    const dy = e.clientY - rect.top - rect.height / 2;
+    x.set(dx * strength);
+    y.set(dy * strength);
   }
 
   function handleMouseLeave() {
-    setTransform("translate(0px, 0px)");
+    x.set(0);
+    y.set(0);
   }
 
-  const props = {
-    ref: ref as React.Ref<HTMLButtonElement & HTMLAnchorElement>,
-    className: `magnetic-btn ${className}`,
-    style: { transform } as React.CSSProperties,
-    onMouseMove: handleMouseMove,
-    onMouseLeave: handleMouseLeave,
-    onClick,
-  };
+  const Component = as === "a" ? motion.a : motion.button;
 
-  if (as === "a" && href) {
-    return <a {...props} href={href}>{children}</a>;
-  }
-
-  return <button {...props}>{children}</button>;
+  return (
+    <Component
+      ref={ref as React.Ref<HTMLButtonElement & HTMLAnchorElement>}
+      className={`magnetic-btn ${className}`}
+      style={{ x: springX, y: springY }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      href={as === "a" ? href : undefined}
+    >
+      {children}
+    </Component>
+  );
 }

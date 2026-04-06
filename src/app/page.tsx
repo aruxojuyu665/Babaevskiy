@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SectionDivider } from "@/components/SectionDivider";
+import { ParallaxGallery } from "@/components/ParallaxGallery";
 import { Hero } from "@/sections/Hero";
 import { TrustBar } from "@/sections/TrustBar";
 import { Transformation } from "@/sections/Transformation";
@@ -26,6 +27,7 @@ export default function Home() {
         <Pricing />
         <SectionDivider variant="stitch" />
         <Cases />
+        <ParallaxGallery />
         <SectionDivider />
         <Process />
         <About />

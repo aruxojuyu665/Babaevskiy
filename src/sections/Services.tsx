@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { SERVICES } from "@/lib/constants";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
-import Image from "next/image";
+import { FocusCards } from "@/components/ui/FocusCards";
+import { SquishyCard } from "@/components/SquishyCard";
+import Tilt from "react-parallax-tilt";
 
 const ICONS: Record<string, React.ReactNode> = {
   sofa: (
@@ -135,12 +137,25 @@ export function Services() {
           </AnimatedHeading>
         </div>
 
-        {/* Cards grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:gap-8">
+        {/* Cards grid — FocusCards blurs siblings on hover */}
+        <FocusCards>
           {SERVICES.map((service, i) => (
-            <ServiceCard key={service.id} service={service} index={i} />
+            <Tilt
+              key={service.id}
+              tiltMaxAngleX={6}
+              tiltMaxAngleY={6}
+              glareEnable
+              glareMaxOpacity={0.08}
+              glareColor="var(--color-accent)"
+              scale={1.01}
+              transitionSpeed={600}
+            >
+              <SquishyCard>
+                <ServiceCard service={service} index={i} />
+              </SquishyCard>
+            </Tilt>
           ))}
-        </div>
+        </FocusCards>
       </div>
     </section>
   );
