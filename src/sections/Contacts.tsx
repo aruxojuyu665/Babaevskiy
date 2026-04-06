@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
 
 export function Contacts() {
   const ref = useRef<HTMLElement>(null);
@@ -54,9 +55,9 @@ export function Contacts() {
           <p className="mb-2 font-accent text-base italic text-[var(--color-primary)]">
             Свяжитесь с нами
           </p>
-          <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+          <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Контакты
-          </h2>
+          </AnimatedHeading>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">

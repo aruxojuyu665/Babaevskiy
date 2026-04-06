@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
 
 const FURNITURE_TYPES = [
   "Диван прямой",
@@ -114,9 +115,9 @@ export function Calculator() {
           <p className="mb-2 font-accent text-base italic text-[var(--color-primary)]">
             Бесплатный расчёт
           </p>
-          <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+          <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Узнать стоимость
-          </h2>
+          </AnimatedHeading>
           <p className="mx-auto mt-4 max-w-lg text-base text-[var(--text-secondary)]">
             Оставьте заявку — мы перезвоним и рассчитаем точную стоимость
           </p>

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
+import { TextRevealByWord } from "@/components/TextRevealByWord";
 
 export function About() {
   const ref = useRef<HTMLElement>(null);
@@ -72,14 +74,12 @@ export function About() {
             >
               О мастерской
             </p>
-            <h2
+            <AnimatedHeading
               data-about-text
               className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl"
             >
-              Мастерство,
-              <br />
-              проверенное временем
-            </h2>
+              Мастерство, проверенное временем
+            </AnimatedHeading>
 
             <div data-about-text className="mt-6 space-y-4 text-base leading-relaxed text-[var(--text-secondary)]">
               <p>
@@ -95,16 +95,12 @@ export function About() {
               </p>
             </div>
 
-            {/* Quote */}
-            <blockquote
-              data-about-text
-              className="mt-8 border-l-2 border-[var(--color-accent)] pl-6"
-            >
-              <p className="font-accent text-xl italic leading-relaxed text-[var(--text-primary)]">
-                «Один мастер — одно изделие. Мастер полностью ведёт работу
-                от начала до конца и несёт личную ответственность за результат.»
-              </p>
-            </blockquote>
+            {/* Quote — scroll-reveal word by word */}
+            <div data-about-text className="mt-8 border-l-2 border-[var(--color-accent)] pl-6">
+              <TextRevealByWord
+                text="Один мастер — одно изделие. Мастер полностью ведёт работу от начала до конца и несёт личную ответственность за результат."
+              />
+            </div>
 
             <div data-about-text className="mt-6 space-y-4 text-base leading-relaxed text-[var(--text-secondary)]">
               <p>

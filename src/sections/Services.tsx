@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SERVICES } from "@/lib/constants";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
 import Image from "next/image";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -129,9 +130,9 @@ export function Services() {
             </p>
             <div className="h-px w-12 bg-[var(--color-accent)]" />
           </div>
-          <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+          <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Наши услуги
-          </h2>
+          </AnimatedHeading>
         </div>
 
         {/* Cards grid */}

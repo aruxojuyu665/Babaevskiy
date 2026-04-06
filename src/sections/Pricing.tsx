@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PRICING } from "@/lib/constants";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
 
 interface PriceTableProps {
   title: string;
@@ -69,9 +70,9 @@ export function Pricing() {
             </p>
             <div className="h-px w-12 bg-[var(--color-accent)]" />
           </div>
-          <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+          <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Стоимость работ
-          </h2>
+          </AnimatedHeading>
           <p className="mx-auto mt-4 max-w-lg text-base text-[var(--text-secondary)]">
             Указаны ориентировочные цены на работу. Стоимость ткани рассчитывается отдельно.
           </p>

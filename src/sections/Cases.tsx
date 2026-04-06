@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { CASES } from "@/lib/constants";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
 
 interface BeforeAfterSliderProps {
   before: string;
@@ -148,9 +149,9 @@ export function Cases() {
           <p className="mb-2 font-accent text-base italic text-[var(--color-primary)]">
             Наши работы
           </p>
-          <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+          <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             До и после
-          </h2>
+          </AnimatedHeading>
           <p className="mx-auto mt-4 max-w-lg text-base text-[var(--text-secondary)]">
             Потяните ползунок, чтобы увидеть разницу
           </p>

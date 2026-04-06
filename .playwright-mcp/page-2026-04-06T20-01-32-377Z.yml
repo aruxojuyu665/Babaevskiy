@@ -1,0 +1,363 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Бабаевская мастерская" [ref=e4] [cursor=pointer]:
+        - /url: "#"
+        - text: Бабаевская
+        - generic [ref=e5]: мастерская
+      - navigation [ref=e6]:
+        - button "Услуги" [ref=e7]
+        - button "Цены" [ref=e8]
+        - button "Портфолио" [ref=e9]
+        - button "О нас" [ref=e10]
+        - button "Контакты" [ref=e11]
+      - generic [ref=e12]:
+        - link "+7 977 977 39 39" [ref=e13] [cursor=pointer]:
+          - /url: tel:+79779773939
+        - button "Рассчитать стоимость" [ref=e14]
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - img "Мастерская" [ref=e17]
+      - generic [ref=e24]:
+        - paragraph [ref=e27]: Мастерская ручной работы
+        - heading "Бабаевская мастерская" [level=1] [ref=e29]:
+          - text: Бабаевская
+          - text: мастерская
+        - paragraph [ref=e30]:
+          - text: Перетяжка мягкой мебели в Москве и МО.
+          - text: Один мастер — одно изделие. Опыт от 6 до 30 лет.
+        - generic [ref=e31]:
+          - button "Рассчитать стоимость" [ref=e32]: Рассчитать стоимость
+          - link "+7 977 977 39 39" [ref=e34] [cursor=pointer]:
+            - /url: tel:+79779773939
+            - text: +7 977 977 39 39
+        - generic [ref=e39]:
+          - textbox "+7 (___) ___-__-__" [ref=e40]
+          - button "Перезвоните мне" [ref=e41]
+      - generic [ref=e44]: листайте
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]: 0+
+        - generic [ref=e51]: лет опыта мастеров
+      - generic [ref=e52]:
+        - generic [ref=e53]: 0+
+        - generic [ref=e54]: перетянутых изделий
+      - generic [ref=e55]:
+        - generic [ref=e56]: 0 мастер
+        - generic [ref=e57]: = 1 изделие
+      - generic [ref=e58]:
+        - generic [ref=e59]: 0 года
+        - generic [ref=e60]: гарантия на работы
+    - generic [ref=e69]:
+      - generic:
+        - generic [ref=e71]:
+          - heading "Старая обивка?" [level=2] [ref=e76]
+          - paragraph [ref=e77]: Не проблема
+        - generic [ref=e79]:
+          - heading "Разберём" [level=2] [ref=e84]
+          - paragraph [ref=e85]: до каркаса
+        - generic [ref=e87]:
+          - heading "Оденем" [level=2] [ref=e92]
+          - paragraph [ref=e93]: в новую ткань
+        - generic [ref=e95]:
+          - heading "Как новый" [level=2] [ref=e100]
+          - paragraph [ref=e101]: С гарантией
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - paragraph [ref=e116]: Что мы делаем
+        - heading "Наши услуги" [level=2] [ref=e118]
+      - generic [ref=e119]:
+        - generic [ref=e123]:
+          - img [ref=e125]
+          - heading "Перетяжка мягкой мебели" [level=3] [ref=e128]
+          - paragraph [ref=e129]: Обновим диваны, кресла, стулья и другую мягкую мебель. Большой выбор тканей и материалов — от классики до современного стиля.
+          - generic [ref=e130]:
+            - text: Подробнее
+            - img [ref=e131]
+        - generic [ref=e136]:
+          - img [ref=e138]
+          - heading "Замена наполнителей" [level=3] [ref=e142]
+          - paragraph [ref=e143]: Вернём мебели упругость и комфорт. Используем только качественные материалы — поролон, пенополиуретан, холлофайбер.
+          - generic [ref=e144]:
+            - text: Подробнее
+            - img [ref=e145]
+        - generic [ref=e150]:
+          - img [ref=e152]
+          - heading "Замена механизмов" [level=3] [ref=e155]
+          - paragraph [ref=e156]: Заменим складные механизмы, пружины и другие элементы. Мебель снова будет работать как новая.
+          - generic [ref=e157]:
+            - text: Подробнее
+            - img [ref=e158]
+        - generic [ref=e163]:
+          - img [ref=e165]
+          - heading "Реставрация дерева" [level=3] [ref=e167]
+          - paragraph [ref=e168]: Устраним сколы и царапины, обновим покрытие, восстановим резьбу и декоративные детали деревянных элементов.
+          - generic [ref=e169]:
+            - text: Подробнее
+            - img [ref=e170]
+    - generic [ref=e180]:
+      - generic [ref=e181]:
+        - paragraph [ref=e184]: Прозрачные цены
+        - heading "Стоимость работ" [level=2] [ref=e186]
+        - paragraph [ref=e187]: Указаны ориентировочные цены на работу. Стоимость ткани рассчитывается отдельно.
+      - generic [ref=e188]:
+        - generic [ref=e189]:
+          - heading "Диваны" [level=3] [ref=e191]
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - generic [ref=e194]: Диван прямой (2-местный)
+              - generic [ref=e195]: от 8 000 ₽
+            - generic [ref=e196]:
+              - generic [ref=e197]: Диван прямой (3-местный)
+              - generic [ref=e198]: от 12 000 ₽
+            - generic [ref=e199]:
+              - generic [ref=e200]: Диван угловой
+              - generic [ref=e201]: от 15 000 ₽
+            - generic [ref=e202]:
+              - generic [ref=e203]: Диван-книжка
+              - generic [ref=e204]: от 7 000 ₽
+        - generic [ref=e205]:
+          - heading "Кресла" [level=3] [ref=e207]
+          - generic [ref=e208]:
+            - generic [ref=e209]:
+              - generic [ref=e210]: Кресло мягкое
+              - generic [ref=e211]: от 5 000 ₽
+            - generic [ref=e212]:
+              - generic [ref=e213]: Кресло-качалка
+              - generic [ref=e214]: от 6 000 ₽
+            - generic [ref=e215]:
+              - generic [ref=e216]: Офисное кресло
+              - generic [ref=e217]: от 4 000 ₽
+        - generic [ref=e218]:
+          - heading "Другая мебель" [level=3] [ref=e220]
+          - generic [ref=e221]:
+            - generic [ref=e222]:
+              - generic [ref=e223]: Стул (сиденье)
+              - generic [ref=e224]: от 1 500 ₽
+            - generic [ref=e225]:
+              - generic [ref=e226]: Стул (сиденье + спинка)
+              - generic [ref=e227]: от 2 500 ₽
+            - generic [ref=e228]:
+              - generic [ref=e229]: Кухонный уголок
+              - generic [ref=e230]: от 6 000 ₽
+            - generic [ref=e231]:
+              - generic [ref=e232]: Кровать (изголовье)
+              - generic [ref=e233]: от 5 000 ₽
+            - generic [ref=e234]:
+              - generic [ref=e235]: Пуф
+              - generic [ref=e236]: от 2 000 ₽
+      - generic [ref=e237]:
+        - paragraph [ref=e238]: Точную стоимость рассчитаем после осмотра мебели
+        - button "Узнать точную стоимость" [ref=e239]: Узнать точную стоимость
+    - generic [ref=e244]:
+      - generic [ref=e245]:
+        - paragraph [ref=e246]: Наши работы
+        - heading "До и после" [level=2] [ref=e247]
+        - paragraph [ref=e248]: Потяните ползунок, чтобы увидеть разницу
+      - 'slider "Сравнение до и после: Угловой диван" [ref=e250]':
+        - img "Угловой диван — после" [ref=e252]
+        - img "Угловой диван — до" [ref=e254]
+        - img [ref=e257]
+        - generic [ref=e260]: До
+        - generic [ref=e261]: После
+      - generic [ref=e262]:
+        - button "Угловой диван" [ref=e263]
+        - button "Классическое кресло" [ref=e264]
+        - button "Кухонный уголок" [ref=e265]
+        - button "Обеденный стул" [ref=e266]
+      - paragraph [ref=e267]: Полная перетяжка с заменой наполнителя
+    - generic [ref=e276]:
+      - generic [ref=e277]:
+        - paragraph [ref=e278]: Просто и понятно
+        - heading "Как мы работаем" [level=2] [ref=e279]
+      - generic [ref=e282]:
+        - generic [ref=e283]:
+          - generic [ref=e284]: "1"
+          - heading "Заявка" [level=3] [ref=e285]
+          - paragraph [ref=e286]: Оставляете заявку на сайте или звоните нам
+        - generic [ref=e287]:
+          - generic [ref=e288]: "2"
+          - heading "Осмотр" [level=3] [ref=e289]
+          - paragraph [ref=e290]: Мастер выезжает, оценивает состояние мебели
+        - generic [ref=e291]:
+          - generic [ref=e292]: "3"
+          - heading "Ткань" [level=3] [ref=e293]
+          - paragraph [ref=e294]: Подбираем материал по каталогу под ваш интерьер
+        - generic [ref=e295]:
+          - generic [ref=e296]: "4"
+          - heading "Работа" [level=3] [ref=e297]
+          - paragraph [ref=e298]: Перетяжка в мастерской — от 3 до 7 дней
+        - generic [ref=e299]:
+          - generic [ref=e300]: "5"
+          - heading "Доставка" [level=3] [ref=e301]
+          - paragraph [ref=e302]: Привозим обновлённую мебель и устанавливаем
+    - generic [ref=e305]:
+      - img "Мастерская Бабаевская" [ref=e307]
+      - generic [ref=e309]:
+        - paragraph [ref=e310]: О мастерской
+        - heading "Мастерство, проверенное временем" [level=2] [ref=e311]:
+          - text: Мастерство,
+          - text: проверенное временем
+        - generic [ref=e312]:
+          - paragraph [ref=e313]: Наша мастерская находится в Москве, по адресу Иркутская 2к4. Мы работаем с мебелью уже многие годы. За это время через руки наших мастеров прошли тысячи изделий.
+          - paragraph [ref=e314]: В нашей команде работают специалисты с опытом от 6 до 30 лет. Это мастера, которые посвятили своему ремеслу большую часть жизни. Многие из них пришли в профессию ещё в начале 90-х и продолжают развиваться в ней до сих пор.
+        - blockquote [ref=e315]:
+          - paragraph [ref=e316]: «Один мастер — одно изделие. Мастер полностью ведёт работу от начала до конца и несёт личную ответственность за результат.»
+        - paragraph [ref=e318]: Мебель — это не просто предмет интерьера. Это часть атмосферы дома, отражение вкуса и характера владельца. Мы понимаем, насколько важно бережно работать с такими вещами.
+    - generic [ref=e322]:
+      - generic [ref=e323]:
+        - paragraph [ref=e324]: Отзывы клиентов
+        - heading "Нам доверяют" [level=2] [ref=e325]
+      - generic [ref=e326]:
+        - generic [ref=e328]:
+          - img [ref=e329]
+          - paragraph [ref=e331]: Перетянули угловой диван — как новый! Мастер Сергей работал аккуратно, всё объяснил по тканям. Рекомендую!
+          - generic [ref=e332]:
+            - paragraph [ref=e333]: Анна К.
+            - paragraph [ref=e334]: Угловой диван
+        - generic:
+          - generic:
+            - img
+            - paragraph: Реставрация бабушкиного кресла — я в восторге. Сохранили форму, заменили наполнитель, обивка шикарная. Спасибо!
+            - generic:
+              - paragraph: Михаил В.
+              - paragraph: Классическое кресло
+        - generic:
+          - generic:
+            - img
+            - paragraph: Кухонный уголок был в ужасном состоянии. Ребята сделали чудо — не узнать! И цена порадовала.
+            - generic:
+              - paragraph: Елена С.
+              - paragraph: Кухонный уголок
+        - generic:
+          - generic:
+            - img
+            - paragraph: Заменили механизм и перетянули диван-книжку. Быстро, качественно, мастер на связи был постоянно. Буду обращаться ещё.
+            - generic:
+              - paragraph: Дмитрий Р.
+              - paragraph: Диван-книжка
+        - generic:
+          - generic:
+            - img
+            - paragraph: Три стула для столовой перетянули за два дня. Подобрали ткань точно в цвет штор. Очень довольна результатом!
+            - generic:
+              - paragraph: Ольга М.
+              - paragraph: Обеденные стулья
+        - generic:
+          - generic:
+            - img
+            - paragraph: Принцип «один мастер — одно изделие» — это видно. Мастер Владимир отнёсся к моему дивану как к своему. Высший класс.
+            - generic:
+              - paragraph: Александр Т.
+              - paragraph: Прямой диван
+      - generic [ref=e335]:
+        - button "Отзыв 1" [ref=e336]
+        - button "Отзыв 2" [ref=e337]
+        - button "Отзыв 3" [ref=e338]
+        - button "Отзыв 4" [ref=e339]
+        - button "Отзыв 5" [ref=e340]
+        - button "Отзыв 6" [ref=e341]
+    - generic [ref=e350]:
+      - generic [ref=e351]:
+        - paragraph [ref=e352]: Бесплатный расчёт
+        - heading "Узнать стоимость" [level=2] [ref=e353]
+        - paragraph [ref=e354]: Оставьте заявку — мы перезвоним и рассчитаем точную стоимость
+      - generic [ref=e355]:
+        - generic [ref=e356]:
+          - generic [ref=e357]:
+            - generic [ref=e358]: Ваше имя
+            - textbox "Иван" [ref=e359]
+          - generic [ref=e360]:
+            - generic [ref=e361]: Телефон *
+            - textbox "+7 (___) ___-__-__" [ref=e362]
+          - generic [ref=e363]:
+            - generic [ref=e364]: Тип мебели
+            - combobox [ref=e365]:
+              - option "Выберите тип мебели" [selected]
+              - option "Диван прямой"
+              - option "Диван угловой"
+              - option "Кресло"
+              - option "Стул"
+              - option "Кухонный уголок"
+              - option "Кровать"
+              - option "Пуф"
+              - option "Другое"
+          - generic [ref=e366]:
+            - generic [ref=e367]: Фото мебели (до 5 файлов)
+            - generic [ref=e368] [cursor=pointer]:
+              - img [ref=e369]
+              - paragraph [ref=e372]: Нажмите или перетащите фото сюда
+          - generic [ref=e373]:
+            - generic [ref=e374]: Комментарий
+            - textbox "Опишите, что нужно сделать..." [ref=e375]
+        - button "Узнать стоимость" [ref=e376]
+    - generic [ref=e378]:
+      - generic [ref=e379]:
+        - paragraph [ref=e380]: Свяжитесь с нами
+        - heading "Контакты" [level=2] [ref=e381]
+      - generic [ref=e382]:
+        - generic [ref=e383]:
+          - generic [ref=e384]:
+            - generic [ref=e385]:
+              - img [ref=e387]
+              - generic [ref=e389]:
+                - paragraph [ref=e390]: Телефон
+                - link "+7 977 977 39 39" [ref=e391] [cursor=pointer]:
+                  - /url: tel:+79779773939
+            - generic [ref=e392]:
+              - img [ref=e394]
+              - generic [ref=e397]:
+                - paragraph [ref=e398]: Адрес
+                - paragraph [ref=e399]: Москва, Иркутская 2к4
+            - generic [ref=e400]:
+              - img [ref=e402]
+              - generic [ref=e405]:
+                - paragraph [ref=e406]: Режим работы
+                - paragraph [ref=e407]: "Пн-Сб: 9:00 — 20:00"
+            - link "Написать в Telegram" [ref=e408] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e409]
+              - text: Написать в Telegram
+          - generic [ref=e411]:
+            - heading "Перезвоним за 5 минут" [level=3] [ref=e412]
+            - generic [ref=e413]:
+              - textbox "+7 (___) ___-__-__" [ref=e414]
+              - button "Позвоните мне" [ref=e415]
+        - iframe [ref=e417]:
+          
+  - contentinfo [ref=e418]:
+    - generic [ref=e419]:
+      - generic [ref=e420]:
+        - generic [ref=e421]:
+          - generic [ref=e422]:
+            - text: Бабаевская
+            - generic [ref=e423]: мастерская
+          - paragraph [ref=e424]: Перетяжка мягкой мебели, замена наполнителей и реставрация в Москве и Московской области.
+        - generic [ref=e425]:
+          - heading "Навигация" [level=4] [ref=e426]
+          - navigation [ref=e427]:
+            - link "Услуги" [ref=e428] [cursor=pointer]:
+              - /url: "#services"
+            - link "Цены" [ref=e429] [cursor=pointer]:
+              - /url: "#pricing"
+            - link "Портфолио" [ref=e430] [cursor=pointer]:
+              - /url: "#cases"
+            - link "О нас" [ref=e431] [cursor=pointer]:
+              - /url: "#about"
+            - link "Контакты" [ref=e432] [cursor=pointer]:
+              - /url: "#contacts"
+        - generic [ref=e433]:
+          - heading "Контакты" [level=4] [ref=e434]
+          - generic [ref=e435]:
+            - link "+7 977 977 39 39" [ref=e436] [cursor=pointer]:
+              - /url: tel:+79779773939
+            - paragraph [ref=e437]: Москва, Иркутская 2к4
+            - paragraph [ref=e438]: "Пн-Сб: 9:00 — 20:00"
+            - link "Telegram" [ref=e439] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e440]
+              - text: Telegram
+      - paragraph [ref=e443]: © 2026 Бабаевская мастерская. Все права защищены.
+  - button "Open Next.js Dev Tools" [ref=e449] [cursor=pointer]:
+    - img [ref=e450]
+  - alert [ref=e453]

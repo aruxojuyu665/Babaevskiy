@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { REVIEWS } from "@/lib/constants";
+import { AnimatedHeading } from "@/components/AnimatedHeading";
 
 export function Reviews() {
   const ref = useRef<HTMLElement>(null);
@@ -42,9 +43,9 @@ export function Reviews() {
           <p className="mb-2 font-accent text-base italic text-[var(--color-primary)]">
             Отзывы клиентов
           </p>
-          <h2 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+          <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Нам доверяют
-          </h2>
+          </AnimatedHeading>
         </div>
 
         {/* Active review */}

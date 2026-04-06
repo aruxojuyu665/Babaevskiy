@@ -11,23 +11,34 @@ export function LenisProvider({ children }: LenisProviderProps) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 2,
-    });
+    async function init() {
+      const gsap = (await import("gsap")).default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
 
-    lenisRef.current = lenis;
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        touchMultiplier: 2,
+        autoRaf: false,
+      });
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+      lenisRef.current = lenis;
+
+      // Sync Lenis scroll events → GSAP ScrollTrigger
+      lenis.on("scroll", ScrollTrigger.update);
+
+      // Use GSAP ticker instead of manual rAF (single unified loop)
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
     }
 
-    requestAnimationFrame(raf);
+    init();
 
     return () => {
-      lenis.destroy();
+      lenisRef.current?.destroy();
     };
   }, []);
 
