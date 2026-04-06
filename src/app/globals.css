@@ -235,15 +235,15 @@ html.lenis body {
 }
 
 /* ===== CSS @starting-style for entry animations ===== */
-@supports (selector(:starting-style)) {
-  .animate-entry {
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    transition-behavior: allow-discrete;
-  }
-  .animate-entry:starting-style {
-    opacity: 0;
-    transform: translateY(12px);
-  }
+/* Note: @starting-style is an at-rule, requires native CSS support.
+   PostCSS/Tailwind v4 cannot parse it yet, so we use @keyframes fallback. */
+.animate-entry {
+  animation: entryFade 0.4s ease both;
+}
+
+@keyframes entryFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ===== CSS Masonry layout ===== */
