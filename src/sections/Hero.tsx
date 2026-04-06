@@ -82,7 +82,7 @@ export function Hero() {
           fill
           className="object-cover"
           priority
-          quality={85}
+          quality={75}
         />
       </div>
 

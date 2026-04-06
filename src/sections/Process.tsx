@@ -19,6 +19,7 @@ export function Process() {
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
+      if (!el) return;
       const ctx = gsap.context(() => {
         ScrollTrigger.create({
           trigger: el,
@@ -28,7 +29,7 @@ export function Process() {
             setProgress(self.progress);
           },
         });
-      }, el);
+      }, el as Element);
 
       cleanup = () => ctx.revert();
     }

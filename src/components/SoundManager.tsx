@@ -1,11 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
+import { createContext, useContext, useState, useRef, useCallback } from "react";
+
+type SoundName = "click" | "reveal" | "success";
 
 interface SoundContextType {
   enabled: boolean;
   toggle: () => void;
-  play: (sound: "click" | "reveal" | "success") => void;
+  play: (sound: SoundName) => void;
 }
 
 const SoundContext = createContext<SoundContextType>({
@@ -20,49 +22,38 @@ export function useSounds() {
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
   const [enabled, setEnabled] = useState(false);
-  const howlerRef = useRef<typeof import("howler") | null>(null);
-  const soundsRef = useRef<Record<string, any>>({});
+  const soundsLoaded = useRef(false);
+  const soundsRef = useRef<Record<string, unknown>>({});
 
-  // Lazy load Howler only when enabled
-  useEffect(() => {
-    if (!enabled) return;
-
-    async function loadSounds() {
+  const loadAndPlay = useCallback(async (sound: SoundName) => {
+    try {
       const { Howl } = await import("howler");
-      howlerRef.current = await import("howler");
 
-      // Use short, warm, low-frequency sounds
-      // These are placeholder URLs — replace with actual sound files
-      soundsRef.current = {
-        click: new Howl({
-          src: ["/sounds/click.webm", "/sounds/click.mp3"],
-          volume: 0.3,
-          preload: true,
-        }),
-        reveal: new Howl({
-          src: ["/sounds/reveal.webm", "/sounds/reveal.mp3"],
-          volume: 0.2,
-          preload: true,
-        }),
-        success: new Howl({
-          src: ["/sounds/success.webm", "/sounds/success.mp3"],
-          volume: 0.3,
-          preload: true,
-        }),
-      };
+      if (!soundsLoaded.current) {
+        // Only create Howl instances on first play — no preload, no 404
+        soundsRef.current = {
+          click: new Howl({ src: ["/sounds/click.webm", "/sounds/click.mp3"], volume: 0.3, preload: false }),
+          reveal: new Howl({ src: ["/sounds/reveal.webm", "/sounds/reveal.mp3"], volume: 0.2, preload: false }),
+          success: new Howl({ src: ["/sounds/success.webm", "/sounds/success.mp3"], volume: 0.3, preload: false }),
+        };
+        soundsLoaded.current = true;
+      }
+
+      const howl = soundsRef.current[sound] as { play: () => void } | undefined;
+      howl?.play();
+    } catch {
+      // Sound files not available — silently ignore
     }
-
-    loadSounds();
-  }, [enabled]);
+  }, []);
 
   const toggle = useCallback(() => setEnabled((prev) => !prev), []);
 
   const play = useCallback(
-    (sound: "click" | "reveal" | "success") => {
+    (sound: SoundName) => {
       if (!enabled) return;
-      soundsRef.current[sound]?.play();
+      loadAndPlay(sound);
     },
-    [enabled]
+    [enabled, loadAndPlay]
   );
 
   return (
