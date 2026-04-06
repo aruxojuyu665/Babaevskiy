@@ -140,17 +140,21 @@ export function Preloader() {
               </g>
             ))}
 
-            {/* Needle — follows path with correct rotation */}
+            {/* Needle — realistic sewing needle shape */}
             <g
               transform={`translate(${needle.x}, ${needle.y}) rotate(${needle.angle})`}
               style={{ transition: "none" }}
             >
-              {/* Needle body — elongated shape pointing in direction of travel */}
-              <ellipse cx="6" cy="0" rx="8" ry="2.2" fill="#8B6544" />
-              {/* Needle tip */}
-              <polygon points="14,0 18,-1.2 18,1.2" fill="#6B5B4E" />
-              {/* Needle eye */}
-              <ellipse cx="-1" cy="0" rx="1.5" ry="1" fill="none" stroke="#D4A574" strokeWidth="0.7" />
+              {/* Needle shaft — long thin metallic body */}
+              <line x1="-12" y1="0" x2="16" y2="0" stroke="#A0937D" strokeWidth="2" strokeLinecap="round" />
+              {/* Needle highlight — metallic shine along shaft */}
+              <line x1="-10" y1="-0.6" x2="14" y2="-0.6" stroke="#C8BCAB" strokeWidth="0.5" opacity="0.6" />
+              {/* Sharp tip */}
+              <polygon points="16,-1 22,0 16,1" fill="#8C8070" />
+              {/* Eye — oval hole near the back end */}
+              <ellipse cx="-8" cy="0" rx="1.8" ry="1.2" fill="var(--bg-primary)" stroke="#8C8070" strokeWidth="0.8" />
+              {/* Thread coming out of the eye */}
+              <line x1="-10" y1="0" x2="-14" y2="1" stroke="#C4956A" strokeWidth="1" strokeLinecap="round" />
             </g>
           </svg>
         </div>
