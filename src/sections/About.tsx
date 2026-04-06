@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
 import { TextRevealByWord } from "@/components/TextRevealByWord";
+import { BlurText } from "@/components/BlurText";
 
 export function About() {
   const ref = useRef<HTMLElement>(null);
@@ -60,7 +61,7 @@ export function About() {
               src="/process/workshop-wide.jpg"
               alt="Мастерская Бабаевская"
               fill
-              className="object-cover"
+              className="object-cover ken-burns"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--text-primary)]/20 to-transparent" />
@@ -102,12 +103,12 @@ export function About() {
               />
             </div>
 
-            <div data-about-text className="mt-6 space-y-4 text-base leading-relaxed text-[var(--text-secondary)]">
-              <p>
-                Мебель — это не просто предмет интерьера. Это часть атмосферы
-                дома, отражение вкуса и характера владельца. Мы понимаем, насколько
-                важно бережно работать с такими вещами.
-              </p>
+            {/* Blur text reveal */}
+            <div data-about-text className="mt-6">
+              <BlurText
+                text="Мебель — это не просто предмет интерьера. Это часть атмосферы дома, отражение вкуса и характера владельца. Мы понимаем, насколько важно бережно работать с такими вещами."
+                className="text-base leading-relaxed text-[var(--text-secondary)]"
+              />
             </div>
           </div>
         </div>

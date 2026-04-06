@@ -144,6 +144,83 @@ html.lenis body {
   will-change: transform, opacity;
 }
 
+/* ===== Infinite scroll (marquee) ===== */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== Animated gradient angle ===== */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 135deg;
+  inherits: false;
+}
+
+.animated-gradient-text {
+  background: linear-gradient(var(--gradient-angle), var(--color-primary), var(--color-accent), var(--color-dark), var(--color-primary));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-rotate 8s ease infinite;
+}
+
+@keyframes gradient-rotate {
+  0% { --gradient-angle: 135deg; background-position: 0% 50%; }
+  50% { --gradient-angle: 315deg; background-position: 100% 50%; }
+  100% { --gradient-angle: 135deg; background-position: 0% 50%; }
+}
+
+/* ===== Ken Burns effect ===== */
+.ken-burns {
+  animation: kenburns 20s ease-in-out infinite alternate;
+}
+
+@keyframes kenburns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.12) translate(-2%, -1.5%); }
+}
+
+/* ===== CSS scroll-driven animations (progressive enhancement) ===== */
+@supports (animation-timeline: scroll()) {
+  .scroll-fade-in {
+    animation: scrollFadeIn linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+
+  @keyframes scrollFadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ===== Floating labels ===== */
+.floating-label-group {
+  position: relative;
+}
+
+.floating-label-group input:focus + label,
+.floating-label-group input:not(:placeholder-shown) + label,
+.floating-label-group textarea:focus + label,
+.floating-label-group textarea:not(:placeholder-shown) + label,
+.floating-label-group select:focus + label,
+.floating-label-group select:valid + label {
+  transform: translateY(-1.6rem) scale(0.85);
+  color: var(--color-primary);
+}
+
+.floating-label-group label {
+  position: absolute;
+  left: 1rem;
+  top: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
 /* ===== Float animation ===== */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

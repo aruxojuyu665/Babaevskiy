@@ -6,6 +6,8 @@ import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { MagneticButton } from "@/components/MagneticButton";
 import { FabricRipple } from "@/components/FabricRipple";
+import { TextGenerateEffect } from "@/components/TextGenerateEffect";
+import { RotatingText } from "@/components/RotatingText";
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -118,20 +120,28 @@ export function Hero() {
         >
           Бабаевская
           <br />
-          <span className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] bg-clip-text text-transparent">
+          <span className="animated-gradient-text">
             мастерская
           </span>
         </h1>
 
-        {/* Subtitle */}
-        <p
-          data-hero-animate
-          className="mx-auto mt-6 max-w-2xl text-lg text-[var(--text-secondary)] md:text-xl"
-        >
-          Перетяжка мягкой мебели в Москве и МО.
-          <br className="hidden sm:block" />
-          Один мастер — одно изделие. Опыт от 6 до 30 лет.
-        </p>
+        {/* Subtitle — words appear one by one after preloader */}
+        <div data-hero-animate className="mx-auto mt-6 max-w-2xl">
+          <TextGenerateEffect
+            text="Перетяжка мягкой мебели в Москве и МО. Один мастер — одно изделие. Опыт от 6 до 30 лет."
+            className="text-lg text-[var(--text-secondary)] md:text-xl"
+            delay={2.8}
+          />
+        </div>
+
+        {/* Rotating text */}
+        <div data-hero-animate className="mt-4">
+          <RotatingText
+            prefix="Мы реставрируем"
+            words={["диваны", "кресла", "стулья", "пуфы", "кровати"]}
+            className="text-base font-medium text-[var(--text-secondary)] md:text-lg"
+          />
+        </div>
 
         {/* CTA Buttons */}
         <div data-hero-animate className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
