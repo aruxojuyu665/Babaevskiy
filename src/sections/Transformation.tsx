@@ -59,12 +59,6 @@ export function Transformation() {
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-[#1a120b]">
-      {/* Decorative corner ornaments */}
-      <div className="absolute top-6 left-6 z-20 h-12 w-12 border-t-2 border-l-2 border-[var(--color-accent)]/30" />
-      <div className="absolute top-6 right-6 z-20 h-12 w-12 border-t-2 border-r-2 border-[var(--color-accent)]/30" />
-      <div className="absolute bottom-6 left-6 z-20 h-12 w-12 border-b-2 border-l-2 border-[var(--color-accent)]/30" />
-      <div className="absolute bottom-6 right-6 z-20 h-12 w-12 border-b-2 border-r-2 border-[var(--color-accent)]/30" />
-
       <div className="relative aspect-[16/9] max-h-[85vh] w-full md:aspect-auto md:h-[85vh]">
         {/* Video */}
         <video

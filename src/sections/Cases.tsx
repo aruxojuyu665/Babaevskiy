@@ -42,11 +42,12 @@ function BeforeAfterSlider({ before, after, title }: BeforeAfterSliderProps) {
   return (
     <div
       ref={containerRef}
-      className="relative aspect-[4/3] w-full cursor-ew-resize overflow-hidden rounded-[var(--radius-lg)]"
+      className="relative aspect-[4/3] w-full cursor-ew-resize overflow-hidden rounded-[var(--radius-lg)] select-none"
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
+      onDragStart={(e) => e.preventDefault()}
       role="slider"
       aria-label={`Сравнение до и после: ${title}`}
       aria-valuenow={Math.round(position)}
@@ -57,7 +58,8 @@ function BeforeAfterSlider({ before, after, title }: BeforeAfterSliderProps) {
           src={after}
           alt={`${title} — после`}
           fill
-          className="object-cover"
+          className="object-cover pointer-events-none"
+          draggable={false}
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
@@ -70,7 +72,8 @@ function BeforeAfterSlider({ before, after, title }: BeforeAfterSliderProps) {
           src={before}
           alt={`${title} — до`}
           fill
-          className="object-cover"
+          className="object-cover pointer-events-none"
+          draggable={false}
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
