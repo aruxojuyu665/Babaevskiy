@@ -74,19 +74,18 @@ function BeforeAfterSlider({ before, after, title }: BeforeAfterSliderProps) {
           sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
-      {/* Fabric curtain texture on the divider */}
+      {/* Fabric curtain texture — visible woven strip along the divider */}
       <div
-        className="absolute top-0 bottom-0 z-10 w-6 -translate-x-1/2 pointer-events-none"
+        className="absolute top-0 bottom-0 z-10 pointer-events-none"
         style={{
-          left: `${position}%`,
-          background: `repeating-linear-gradient(
-            180deg,
-            rgba(196, 149, 106, 0.15) 0px,
-            rgba(196, 149, 106, 0.05) 2px,
-            transparent 2px,
-            transparent 4px
-          )`,
-          backdropFilter: "blur(1px)",
+          left: `calc(${position}% - 16px)`,
+          width: "32px",
+          background: `
+            repeating-linear-gradient(0deg, rgba(196,149,106,0.25) 0px, transparent 1px, transparent 3px, rgba(196,149,106,0.25) 4px),
+            repeating-linear-gradient(90deg, rgba(196,149,106,0.15) 0px, transparent 1px, transparent 3px, rgba(196,149,106,0.15) 4px)
+          `,
+          backdropFilter: "blur(2px)",
+          boxShadow: "0 0 20px rgba(196,149,106,0.15)",
         }}
       />
       {/* Divider line */}

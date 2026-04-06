@@ -88,7 +88,7 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/80 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/90" />
 
       {/* Fabric ripple — ткань дышит за курсором (desktop only) */}
-      <div className="absolute inset-0 hidden md:block">
+      <div className="absolute inset-0 hidden md:block" style={{ pointerEvents: "none" }}>
         <FabricRipple />
       </div>
 

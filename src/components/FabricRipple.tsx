@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 
 export function FabricRipple() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const targetRef = useRef({ x: 0.5, y: 0.5 });
+  const mouse = useRef({ x: 0.5, y: 0.5 });
+  const smoothMouse = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -13,15 +13,15 @@ export function FabricRipple() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animFrame: number;
-    let width = 0;
-    let height = 0;
+    let frame: number;
+    let w = 0;
+    let h = 0;
 
     function resize() {
-      width = canvas!.offsetWidth;
-      height = canvas!.offsetHeight;
-      canvas!.width = width;
-      canvas!.height = height;
+      w = canvas!.offsetWidth;
+      h = canvas!.offsetHeight;
+      canvas!.width = w;
+      canvas!.height = h;
     }
 
     resize();
@@ -29,74 +29,80 @@ export function FabricRipple() {
 
     function onMouseMove(e: MouseEvent) {
       const rect = canvas!.getBoundingClientRect();
-      targetRef.current = {
+      mouse.current = {
         x: (e.clientX - rect.left) / rect.width,
         y: (e.clientY - rect.top) / rect.height,
       };
     }
 
-    canvas.addEventListener("mousemove", onMouseMove);
+    // Listen on document since canvas parent has pointer-events:none
+    document.addEventListener("mousemove", onMouseMove);
 
     function draw() {
-      // Smooth lerp toward target
-      mouseRef.current.x += (targetRef.current.x - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (targetRef.current.y - mouseRef.current.y) * 0.05;
+      // Smooth follow
+      smoothMouse.current.x += (mouse.current.x - smoothMouse.current.x) * 0.08;
+      smoothMouse.current.y += (mouse.current.y - smoothMouse.current.y) * 0.08;
 
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
+      ctx!.clearRect(0, 0, w, h);
 
-      ctx!.clearRect(0, 0, width, height);
+      const mx = smoothMouse.current.x;
+      const my = smoothMouse.current.y;
+      const time = Date.now() * 0.0008;
 
-      // Draw fabric-like wave pattern influenced by mouse
-      const time = Date.now() * 0.001;
-      const cols = 40;
-      const rows = 25;
-      const cellW = width / cols;
-      const cellH = height / rows;
+      // Draw visible fabric-like distortion waves
+      const cols = 50;
+      const rows = 30;
+      const cellW = w / cols;
+      const cellH = h / rows;
 
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const cx = (col + 0.5) / cols;
-          const cy = (row + 0.5) / rows;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cx = (c + 0.5) / cols;
+          const cy = (r + 0.5) / rows;
 
-          // Distance from mouse
           const dx = cx - mx;
           const dy = cy - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          // Displacement wave
-          const wave = Math.sin(dist * 12 - time * 2) * Math.max(0, 1 - dist * 2.5);
-          const offsetX = wave * 3;
-          const offsetY = wave * 2;
+          // Ripple wave from mouse position
+          const wave = Math.sin(dist * 15 - time * 3) * Math.max(0, 0.8 - dist * 2);
+          const offsetX = wave * 4;
+          const offsetY = wave * 3;
 
-          // Brightness variation
-          const brightness = 0.02 + wave * 0.015;
+          // Brightness — more visible near cursor
+          const brightness = wave * 0.06;
 
-          const x = col * cellW + offsetX;
-          const y = row * cellH + offsetY;
+          if (Math.abs(brightness) < 0.005) continue;
 
-          ctx!.fillStyle = `rgba(196, 149, 106, ${Math.abs(brightness)})`;
-          ctx!.fillRect(x, y, cellW + 1, cellH + 1);
+          const x = c * cellW + offsetX;
+          const y = r * cellH + offsetY;
+
+          if (brightness > 0) {
+            ctx!.fillStyle = `rgba(196, 149, 106, ${brightness})`;
+          } else {
+            ctx!.fillStyle = `rgba(44, 24, 16, ${-brightness * 0.5})`;
+          }
+          ctx!.fillRect(x, y, cellW + 0.5, cellH + 0.5);
         }
       }
 
-      animFrame = requestAnimationFrame(draw);
+      frame = requestAnimationFrame(draw);
     }
 
     draw();
 
     return () => {
-      cancelAnimationFrame(animFrame);
+      cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
-      canvas.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mousemove", onMouseMove);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-auto absolute inset-0 h-full w-full opacity-60"
-      style={{ mixBlendMode: "soft-light" }}
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      style={{ opacity: 1, mixBlendMode: "overlay" }}
     />
   );
 }

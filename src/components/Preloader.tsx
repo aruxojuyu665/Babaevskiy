@@ -1,116 +1,101 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export function Preloader() {
+  const [phase, setPhase] = useState<"loading" | "reveal" | "done">("loading");
   const [progress, setProgress] = useState(0);
-  const [hidden, setHidden] = useState(false);
+  const pathRef = useRef<SVGPathElement>(null);
 
   useEffect(() => {
-    // Animate progress 0 → 100 over 2.5s
-    const duration = 2500;
+    const duration = 2200;
     const start = performance.now();
 
     function tick(now: number) {
       const elapsed = now - start;
       const p = Math.min(elapsed / duration, 1);
-      // Ease out quad
-      const eased = 1 - (1 - p) * (1 - p);
+      const eased = 1 - Math.pow(1 - p, 3);
       setProgress(eased * 100);
+
       if (p < 1) {
         requestAnimationFrame(tick);
       } else {
-        // Fade out after complete
-        setTimeout(() => setHidden(true), 400);
+        setPhase("reveal");
+        setTimeout(() => setPhase("done"), 600);
       }
     }
 
     requestAnimationFrame(tick);
   }, []);
 
-  if (hidden) return null;
-
-  const fadeOut = progress >= 100;
+  if (phase === "done") return null;
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-[var(--bg-primary)] transition-opacity duration-500"
-      style={{ opacity: fadeOut ? 0 : 1, pointerEvents: fadeOut ? "none" : "auto" }}
+      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-[var(--bg-primary)]"
+      style={{
+        opacity: phase === "reveal" ? 0 : 1,
+        transition: "opacity 0.6s ease",
+        pointerEvents: phase === "reveal" ? "none" : "auto",
+      }}
     >
-      {/* Needle + thread SVG animation */}
-      <div className="relative mb-8 h-16 w-64">
-        <svg viewBox="0 0 260 60" fill="none" className="h-full w-full">
-          {/* Thread line — draws as progress increases */}
-          <path
-            d="M10 30 Q 40 10, 70 30 Q 100 50, 130 30 Q 160 10, 190 30 Q 220 50, 250 30"
-            stroke="var(--color-accent)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            fill="none"
-            strokeDasharray="300"
-            strokeDashoffset={300 - (progress / 100) * 300}
-            className="transition-all duration-100"
-          />
-          {/* Stitch marks along the thread */}
-          {[70, 130, 190].map((x, i) => (
-            <line
-              key={i}
-              x1={x}
-              y1="22"
-              x2={x}
-              y2="38"
-              stroke="var(--color-primary)"
-              strokeWidth="1.5"
+      {/* Центральный блок */}
+      <div className="flex flex-col items-center">
+        {/* Нитка со стежком — SVG */}
+        <div className="mb-10 w-56 md:w-72">
+          <svg viewBox="0 0 300 40" fill="none" className="w-full">
+            {/* Нитка — рисуется по мере загрузки */}
+            <path
+              ref={pathRef}
+              d="M 20 20 C 60 6, 90 34, 130 20 C 170 6, 200 34, 240 20 C 260 12, 275 20, 280 20"
+              stroke="#C4956A"
+              strokeWidth="2"
               strokeLinecap="round"
-              opacity={progress > (i + 1) * 25 ? 1 : 0}
-              className="transition-opacity duration-300"
+              fill="none"
+              strokeDasharray="320"
+              strokeDashoffset={320 - (progress / 100) * 320}
             />
-          ))}
-          {/* Needle — moves along the path */}
-          <g
-            style={{
-              transform: `translateX(${(progress / 100) * 240}px)`,
-              transition: "transform 0.1s linear",
-            }}
-          >
-            {/* Needle body */}
-            <ellipse cx="10" cy="30" rx="8" ry="3" fill="var(--color-primary)" />
-            {/* Needle eye */}
-            <circle cx="6" cy="30" r="1" fill="var(--bg-primary)" />
-            {/* Needle tip */}
-            <path d="M18 30 L22 29 L22 31 Z" fill="var(--color-dark)" />
-          </g>
-        </svg>
-      </div>
+            {/* Стежки — появляются по мере прогресса */}
+            {[80, 135, 190].map((x, i) => (
+              <g key={i} opacity={progress > (i + 1) * 28 ? 1 : 0} style={{ transition: "opacity 0.4s" }}>
+                <line x1={x - 4} y1="13" x2={x + 4} y2="27" stroke="#8B6544" strokeWidth="1.5" strokeLinecap="round" />
+              </g>
+            ))}
+            {/* Игла — движется вдоль нитки */}
+            <g style={{ transform: `translateX(${(progress / 100) * 260}px)`, transition: "transform 0.15s linear" }}>
+              <line x1="18" y1="17" x2="28" y2="23" stroke="#8B6544" strokeWidth="2.5" strokeLinecap="round" />
+              <circle cx="19" cy="17.5" r="1.5" fill="none" stroke="#8B6544" strokeWidth="1" />
+            </g>
+          </svg>
+        </div>
 
-      {/* Brand name — reveals letter by letter */}
-      <h1 className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
-        {"Бабаевская".split("").map((char, i) => (
-          <span
-            key={i}
-            className="inline-block transition-all duration-300"
-            style={{
-              opacity: progress > (i / 10) * 80 + 10 ? 1 : 0,
-              transform: progress > (i / 10) * 80 + 10 ? "translateY(0)" : "translateY(8px)",
-            }}
-          >
-            {char}
-          </span>
-        ))}
-      </h1>
-      <p
-        className="mt-1 text-xs tracking-[0.3em] uppercase text-[var(--text-muted)] transition-opacity duration-500"
-        style={{ opacity: progress > 60 ? 1 : 0 }}
-      >
-        мастерская
-      </p>
+        {/* Название — плавное появление целиком */}
+        <h1
+          className="font-serif text-4xl font-bold text-[var(--text-primary)] md:text-5xl transition-all duration-700"
+          style={{
+            opacity: progress > 30 ? 1 : 0,
+            transform: progress > 30 ? "translateY(0)" : "translateY(12px)",
+          }}
+        >
+          Бабаевская
+        </h1>
+        <p
+          className="mt-2 text-sm tracking-[0.3em] uppercase text-[var(--text-muted)] transition-all duration-700 delay-200"
+          style={{
+            opacity: progress > 50 ? 1 : 0,
+            transform: progress > 50 ? "translateY(0)" : "translateY(8px)",
+          }}
+        >
+          мастерская
+        </p>
 
-      {/* Progress bar */}
-      <div className="mt-8 h-0.5 w-32 overflow-hidden rounded-full bg-[var(--border)]">
-        <div
-          className="h-full rounded-full bg-[var(--color-primary)] transition-all duration-100"
-          style={{ width: `${progress}%` }}
-        />
+        {/* Полоска прогресса */}
+        <div className="mt-10 h-[2px] w-40 overflow-hidden rounded-full bg-[var(--border)]">
+          <div
+            className="h-full rounded-full bg-[var(--color-primary)]"
+            style={{ width: `${progress}%`, transition: "width 0.15s linear" }}
+          />
+        </div>
       </div>
     </div>
   );
