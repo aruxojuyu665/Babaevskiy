@@ -131,6 +131,19 @@ html.lenis body {
   background: var(--color-dark);
 }
 
+/* ===== GSAP animation targets — visible by default, hidden by JS ===== */
+[data-service-card],
+[data-pricing-card],
+[data-step],
+[data-calc-animate],
+[data-contacts-animate],
+[data-cases-animate],
+[data-about-text],
+[data-about-image],
+[data-reviews-animate] {
+  will-change: transform, opacity;
+}
+
 /* ===== Phone input mask ===== */
 input[type="tel"]::placeholder {
   color: var(--text-muted);

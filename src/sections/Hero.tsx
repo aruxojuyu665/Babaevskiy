@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
+import { MagneticButton } from "@/components/MagneticButton";
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -95,14 +96,14 @@ export function Hero() {
 
         {/* CTA */}
         <div data-hero-animate className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <button
+          <MagneticButton
             onClick={() => {
               document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="magnetic-btn rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-medium text-white shadow-[var(--shadow-warm)] transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)]"
+            className="rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-medium text-white shadow-[var(--shadow-warm)] transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)]"
           >
             Рассчитать стоимость
-          </button>
+          </MagneticButton>
           <a
             href={BUSINESS.phoneHref}
             className="flex items-center gap-2 rounded-full border-2 border-[var(--border)] px-8 py-4 text-base font-medium text-[var(--text-primary)] transition-all hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"

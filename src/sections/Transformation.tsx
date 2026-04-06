@@ -1,63 +1,55 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ScrollVideoPlayer } from "@/components/ScrollVideoPlayer";
+
+const FRAME_COUNT = 121;
+const FRAMES_PATH = "/frames";
+
+const SCROLL_TEXTS = [
+  "Старая обивка? Не проблема.",
+  "Разберём до каркаса",
+  "Оденем в новую ткань",
+  "Как новый. С гарантией.",
+];
 
 export function Transformation() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const mobileRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
-
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Desktop: scroll-driven video playback
-  useEffect(() => {
-    if (isMobile) return;
+  if (isMobile) {
+    return <MobileTransformation ref={mobileRef} />;
+  }
 
-    async function setupScrollVideo() {
+  return <DesktopTransformation />;
+}
+
+/* ─── Desktop: Canvas scroll-driven ─── */
+function DesktopTransformation() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function setupTextAnimations() {
       const gsap = (await import("gsap")).default;
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      const video = videoRef.current;
-      if (!video) return;
-
-      // Wait for video metadata
-      await new Promise<void>((resolve) => {
-        if (video.readyState >= 1) {
-          resolve();
-        } else {
-          video.addEventListener("loadedmetadata", () => resolve(), { once: true });
-        }
-      });
-
       const ctx = gsap.context(() => {
-        // Scroll-driven video playback
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          onUpdate: (self) => {
-            if (video.duration) {
-              video.currentTime = self.progress * video.duration;
-            }
-          },
-        });
-
-        // Text reveals synced to scroll
         const texts = sectionRef.current?.querySelectorAll("[data-transform-text]");
         texts?.forEach((text, i) => {
-          const start = i * 25; // 0%, 25%, 50%, 75%
-          const end = start + 20;
+          const start = i * 25;
+          const end = start + 18;
 
           gsap.fromTo(
             text,
-            { y: 30, opacity: 0 },
+            { y: 40, opacity: 0 },
             {
               y: 0,
               opacity: 1,
@@ -71,15 +63,14 @@ export function Transformation() {
             }
           );
 
-          // Fade out
           if (i < 3) {
             gsap.to(text, {
               opacity: 0,
-              y: -20,
+              y: -30,
               scrollTrigger: {
                 trigger: sectionRef.current,
                 start: `${end + 2}% top`,
-                end: `${end + 8}% top`,
+                end: `${end + 7}% top`,
                 scrub: 1,
               },
             });
@@ -90,64 +81,60 @@ export function Transformation() {
       return () => ctx.revert();
     }
 
-    setupScrollVideo();
-  }, [isMobile]);
-
-  const SCROLL_TEXTS = [
-    "Старая обивка? Не проблема.",
-    "Разберём до каркаса",
-    "Оденем в новую ткань",
-    "Как новый. С гарантией.",
-  ];
+    setupTextAnimations();
+  }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className={isMobile ? "relative" : "relative h-[400vh]"}
-    >
-      <div className={isMobile ? "relative" : "sticky top-0 h-screen overflow-hidden"}>
-        {/* Video */}
-        <video
-          ref={videoRef}
-          src="/video/sofa-transform.mp4"
-          muted
-          playsInline
-          preload="auto"
-          {...(isMobile ? { autoPlay: true, loop: true } : {})}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+    <div ref={sectionRef} className="relative">
+      {/* Canvas scroll player — occupies 400vh */}
+      <ScrollVideoPlayer frameCount={FRAME_COUNT} framesPath={FRAMES_PATH} />
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/40 via-transparent to-[var(--bg-primary)]/60" />
-
-        {/* Text overlays */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {isMobile ? (
+      {/* Text overlays — positioned absolutely over the sticky canvas */}
+      <div className="pointer-events-none absolute inset-0">
+        {SCROLL_TEXTS.map((text, i) => (
+          <div
+            key={i}
+            data-transform-text
+            className="sticky top-0 flex h-screen items-center justify-center opacity-0"
+          >
             <div className="text-center px-4">
-              <h2 className="font-serif text-3xl font-bold text-white drop-shadow-lg">
-                Как новый.
-                <br />С гарантией.
+              <div className="mx-auto mb-4 w-16 stitch-divider" />
+              <h2 className="font-serif text-3xl font-bold text-white drop-shadow-lg md:text-5xl lg:text-6xl">
+                {text}
               </h2>
             </div>
-          ) : (
-            SCROLL_TEXTS.map((text, i) => (
-              <div
-                key={i}
-                data-transform-text
-                className="absolute inset-0 flex items-center justify-center opacity-0"
-              >
-                <div className="text-center px-4">
-                  {/* Stitch line */}
-                  <div className="mx-auto mb-4 w-16 stitch-divider" />
-                  <h2 className="font-serif text-3xl font-bold text-white drop-shadow-lg md:text-5xl lg:text-6xl">
-                    {text}
-                  </h2>
-                </div>
-              </div>
-            ))
-          )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Mobile: Autoplay video ─── */
+import { forwardRef } from "react";
+
+const MobileTransformation = forwardRef<HTMLElement>(function MobileTransformation(_, ref) {
+  return (
+    <section ref={ref} className="relative aspect-video w-full overflow-hidden">
+      <video
+        src="/video/sofa-transform.mp4"
+        muted
+        autoPlay
+        loop
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/30 via-transparent to-[var(--bg-primary)]/60" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-center px-6">
+          <div className="mx-auto mb-3 w-12 stitch-divider" />
+          <h2 className="font-serif text-2xl font-bold text-white drop-shadow-lg sm:text-3xl">
+            Как новый.
+            <br />
+            С гарантией.
+          </h2>
         </div>
       </div>
     </section>
   );
-}
+});

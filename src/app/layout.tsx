@@ -45,6 +45,28 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Бабаевская мастерская",
+  description:
+    "Перетяжка мягкой мебели, замена наполнителей и реставрация в Москве и МО",
+  telephone: "+7 977 977 39 39",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Иркутская 2к4",
+    addressLocality: "Москва",
+    addressCountry: "RU",
+  },
+  openingHours: "Mo-Sa 09:00-20:00",
+  areaServed: {
+    "@type": "GeoCircle",
+    geoMidpoint: { "@type": "GeoCoordinates", latitude: 55.831, longitude: 37.565 },
+    geoRadius: "50000",
+  },
+  priceRange: "₽₽",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -55,6 +77,12 @@ export default function RootLayout({
       lang="ru"
       className={`${inter.variable} ${playfair.variable} ${cormorant.variable}`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased">
         <LenisProvider>
           {children}
