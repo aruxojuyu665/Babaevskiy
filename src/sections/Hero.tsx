@@ -5,6 +5,7 @@ import Image from "next/image";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { MagneticButton } from "@/components/MagneticButton";
+import { FabricRipple } from "@/components/FabricRipple";
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -14,7 +15,11 @@ export function Hero() {
   useEffect(() => {
     async function animate() {
       const gsap = (await import("gsap")).default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
+
       const ctx = gsap.context(() => {
+        // Staggered entrance
         gsap.from("[data-hero-animate]", {
           y: 40,
           opacity: 0,
@@ -22,6 +27,18 @@ export function Hero() {
           stagger: 0.15,
           ease: "power3.out",
           delay: 0.3,
+        });
+
+        // Parallax on background image
+        gsap.to("[data-hero-parallax]", {
+          y: 80,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+          },
         });
       }, sectionRef);
       return () => ctx.revert();
@@ -55,18 +72,25 @@ export function Hero() {
       ref={sectionRef}
       className="relative flex min-h-screen items-center justify-center overflow-hidden"
     >
-      {/* Background image */}
-      <Image
-        src="/process/workshop-hero.jpg"
-        alt="Мастерская"
-        fill
-        className="object-cover"
-        priority
-        quality={85}
-      />
+      {/* Background image with parallax */}
+      <div data-hero-parallax className="absolute inset-0 scale-110">
+        <Image
+          src="/process/workshop-hero.jpg"
+          alt="Мастерская"
+          fill
+          className="object-cover"
+          priority
+          quality={85}
+        />
+      </div>
 
       {/* Warm overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/80 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/90" />
+
+      {/* Fabric ripple — ткань дышит за курсором (desktop only) */}
+      <div className="absolute inset-0 hidden md:block">
+        <FabricRipple />
+      </div>
 
       {/* Floating decorative elements */}
       <div className="absolute top-20 left-10 h-32 w-32 animate-[float_6s_ease-in-out_infinite] rounded-full bg-[var(--color-primary)]/[0.06] blur-2xl" />

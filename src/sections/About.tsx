@@ -28,6 +28,17 @@ export function About() {
           ease: "power2.out",
           scrollTrigger: { trigger: ref.current, start: "top 80%" },
         });
+        // Parallax on About image
+        gsap.to("[data-about-image] img", {
+          y: 40,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
       }, ref);
       return () => ctx.revert();
     }

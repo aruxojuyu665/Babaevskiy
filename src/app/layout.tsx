@@ -3,6 +3,8 @@ import { Inter, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/LenisProvider";
 import { GrainOverlay } from "@/components/GrainOverlay";
+import { Preloader } from "@/components/Preloader";
+import { WarmCursor } from "@/components/WarmCursor";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -85,6 +87,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased">
         <LenisProvider>
+          <Preloader />
+          <WarmCursor />
           {children}
           <GrainOverlay />
         </LenisProvider>
