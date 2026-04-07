@@ -5,7 +5,6 @@ import { LenisProvider } from "@/components/LenisProvider";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { Preloader } from "@/components/Preloader";
 import { WarmCursor } from "@/components/WarmCursor";
-import { SoundProvider } from "@/components/SoundManager";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -87,14 +86,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased">
-        <SoundProvider>
-          <LenisProvider>
-            <Preloader />
-            <WarmCursor />
-            {children}
-            <GrainOverlay />
-          </LenisProvider>
-        </SoundProvider>
+        <LenisProvider>
+          <Preloader />
+          <WarmCursor />
+          {children}
+          <GrainOverlay />
+        </LenisProvider>
       </body>
     </html>
   );
