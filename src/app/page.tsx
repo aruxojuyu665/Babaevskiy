@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SectionDivider } from "@/components/SectionDivider";
+import { FabricShowcase } from "@/sections/FabricShowcase";
 import { Hero } from "@/sections/Hero";
 import { TrustBar } from "@/sections/TrustBar";
 import { Transformation } from "@/sections/Transformation";
@@ -27,6 +28,8 @@ export default function Home() {
         <SectionDivider variant="stitch" />
         <Cases />
         <SectionDivider />
+        <FabricShowcase />
+        <SectionDivider variant="stitch" />
         <Process />
         <About />
         <SectionDivider variant="stitch" />

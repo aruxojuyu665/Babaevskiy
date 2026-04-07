@@ -282,6 +282,16 @@ html.lenis body {
   box-shadow: var(--shadow-warm-sm);
 }
 
+/* ===== Fabric breathe (mobile fallback) ===== */
+@keyframes breathe {
+  0%, 100% { transform: scale(1) rotate3d(1,1,0,0deg); }
+  50% { transform: scale(1.02) rotate3d(1,1,0,1deg); }
+}
+
+/* ===== Hide scrollbar ===== */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ===== Float animation ===== */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

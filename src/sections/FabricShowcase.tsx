@@ -1,29 +1,30 @@
 "use client";
 
-import { useState, useRef, useMemo, useEffect, Suspense, useCallback } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
 import { useIsDesktop } from "@/lib/animations";
 import Image from "next/image";
 
-// Lazy load R3F canvases — no SSR
-const FurnitureViewerCanvas = dynamic(() => import("@/components/r3f/FurnitureViewerCanvas").then(m => ({ default: m.FurnitureViewerCanvas })), { ssr: false });
+// Single Canvas — lazy loaded, no SSR
+const FabricShowcaseCanvas = dynamic(
+  () => import("@/components/r3f/FabricShowcaseCanvas").then((m) => ({ default: m.FabricShowcaseCanvas })),
+  { ssr: false }
+);
 
 const FABRICS = [
-  { id: "velvet", name: "Велюр", color: "#8B6544", preview: "/models/fabric-textures/velvet/color.jpg" },
-  { id: "leather", name: "Кожа", color: "#A0937D", preview: "/models/fabric-textures/leather/color.jpg" },
-  { id: "linen", name: "Лён", color: "#C4B49A", preview: "/models/fabric-textures/linen/color.jpg" },
+  { id: "velvet", name: "Велюр", desc: "Мягкий, бархатистый", preview: "/models/fabric-textures/velvet/color.jpg" },
+  { id: "leather", name: "Кожа", desc: "Натуральная кожа", preview: "/models/fabric-textures/leather/color.jpg" },
+  { id: "linen", name: "Лён", desc: "Лёгкий, дышащий", preview: "/models/fabric-textures/linen/color.jpg" },
+  { id: "wool", name: "Шерсть", desc: "Шерсть ёлочка", preview: "/models/fabric-textures/wool/color.jpg" },
+  { id: "fleece", name: "Флис", desc: "Вязаный флис", preview: "/models/fabric-textures/fleece/color.jpg" },
 ] as const;
 
-type FabricId = typeof FABRICS[number]["id"];
-
 export function FabricShowcase() {
-  const [activeFabric, setActiveFabric] = useState<FabricId>("velvet");
-  const [inView, setInView] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
   const desktop = useIsDesktop();
 
-  // Lazy render — only when section enters viewport
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -42,107 +43,75 @@ export function FabricShowcase() {
 
   return (
     <section ref={sectionRef} className="section-padding bg-[var(--bg-surface)] overflow-hidden">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-12 text-center md:mb-16">
           <div className="mx-auto mb-4 flex items-center justify-center gap-3">
             <div className="h-px w-12 bg-[var(--color-accent)]" />
             <p className="font-accent text-base italic text-[var(--color-primary)]">
-              Подберём идеальную ткань
+              Более 1250 материалов
             </p>
             <div className="h-px w-12 bg-[var(--color-accent)]" />
           </div>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
-            Более 1250 материалов на выбор
+            Подберём ткань под ваш интерьер
           </AnimatedHeading>
-          <p className="mx-auto mt-4 max-w-lg text-base text-[var(--text-secondary)]">
-            Подберём идеальную ткань под ваш интерьер. Приезжайте в мастерскую — покажем каталог вживую.
+          <p className="mx-auto mt-4 max-w-xl text-base text-[var(--text-secondary)]">
+            От классики до модерна. Потрогайте, чтобы почувствовать.
           </p>
         </div>
 
-        {/* Two-column layout */}
-        <div className="grid items-start gap-8 lg:grid-cols-[280px_1fr] lg:gap-12">
-          {/* LEFT: Fabric swatches */}
-          <div className="flex flex-row gap-4 lg:flex-col lg:gap-6">
-            {FABRICS.map((fabric) => (
-              <button
-                key={fabric.id}
-                onClick={() => setActiveFabric(fabric.id)}
-                className="group flex-1 lg:flex-none"
-              >
-                <div
-                  className="overflow-hidden rounded-2xl border-2 transition-all duration-300"
-                  style={{
-                    borderColor: activeFabric === fabric.id ? "var(--color-primary)" : "var(--border)",
-                    boxShadow: activeFabric === fabric.id ? "var(--shadow-warm)" : "none",
-                  }}
-                >
-                  {/* Swatch — static image with hover zoom */}
-                  <div className="aspect-square w-full relative overflow-hidden">
-                    <Image
-                      src={fabric.preview}
-                      alt={fabric.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="200px"
-                    />
-                    {/* Active indicator pulse */}
-                    {activeFabric === fabric.id && (
-                      <div className="absolute inset-0 border-2 border-[var(--color-primary)]/30 rounded-2xl animate-pulse" />
-                    )}
-                  </div>
+        {/* Desktop: single R3F Canvas with 5 planes */}
+        {desktop && inView ? (
+          <div className="relative" style={{ cursor: "grab" }}>
+            <div className="h-[380px] w-full">
+              <FabricShowcaseCanvas />
+            </div>
+            {/* Labels positioned under each plane */}
+            <div className="mt-4 grid grid-cols-5 gap-4">
+              {FABRICS.map((f) => (
+                <div key={f.id} className="text-center">
+                  <p className="text-base font-semibold text-[var(--text-primary)]">{f.name}</p>
+                  <p className="mt-0.5 text-sm text-[var(--text-secondary)]">{f.desc}</p>
                 </div>
-                <p
-                  className="mt-2 text-center text-sm font-medium transition-colors"
-                  style={{
-                    color: activeFabric === fabric.id ? "var(--color-primary)" : "var(--text-secondary)",
-                  }}
-                >
-                  {fabric.name}
-                </p>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
-
-          {/* RIGHT: 3D Furniture viewer */}
-          <div className="relative overflow-hidden rounded-2xl bg-[var(--bg-elevated)]" style={{ boxShadow: "var(--shadow-warm-lg)" }}>
-            <div className="aspect-[4/3] w-full md:aspect-[16/10]">
-              {desktop && inView ? (
-                <FurnitureViewerCanvas activeFabric={activeFabric} />
-              ) : (
-                /* Mobile fallback — static image with fabric color buttons */
-                <div className="relative h-full w-full">
+        ) : (
+          /* Mobile: horizontal scroll with static images + CSS breathe */
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-5 md:overflow-visible">
+            {FABRICS.map((f) => (
+              <div key={f.id} className="shrink-0 snap-center" style={{ width: "240px" }}>
+                <div className="group relative aspect-square overflow-hidden rounded-2xl border border-[var(--border)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(139,101,68,0.15)] hover:-translate-y-1">
                   <Image
-                    src="/cases/case-2-after.jpg"
-                    alt="Кресло"
+                    src={f.preview}
+                    alt={f.name}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 70vw"
+                    sizes="240px"
+                    style={{ animation: "breathe 6s ease-in-out infinite" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                  <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-3">
-                    {FABRICS.map((f) => (
-                      <button
-                        key={f.id}
-                        onClick={() => setActiveFabric(f.id)}
-                        className="h-8 w-8 rounded-full border-2 transition-all"
-                        style={{
-                          backgroundColor: f.color,
-                          borderColor: activeFabric === f.id ? "white" : "transparent",
-                          transform: activeFabric === f.id ? "scale(1.2)" : "scale(1)",
-                        }}
-                        aria-label={f.name}
-                      />
-                    ))}
-                  </div>
                 </div>
-              )}
-            </div>
-            {/* Label */}
-            <div className="absolute top-4 left-4 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-[var(--text-secondary)] backdrop-blur">
-              Вращайте мышью
-            </div>
+                <div className="mt-3 text-center">
+                  <p className="text-base font-semibold text-[var(--text-primary)]">{f.name}</p>
+                  <p className="mt-0.5 text-sm text-[var(--text-secondary)]">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
+        )}
+
+        {/* CTA */}
+        <div className="mt-10 text-center">
+          <button
+            onClick={() => document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" })}
+            className="group inline-flex items-center gap-2 text-base font-medium text-[var(--color-primary)] transition-all hover:gap-3"
+          >
+            Смотреть весь каталог
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
     </section>
