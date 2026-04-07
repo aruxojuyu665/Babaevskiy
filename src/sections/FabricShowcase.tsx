@@ -7,7 +7,6 @@ import { useIsDesktop } from "@/lib/animations";
 import Image from "next/image";
 
 // Lazy load R3F canvases — no SSR
-const FabricSwatchCanvas = dynamic(() => import("@/components/r3f/FabricSwatchCanvas").then(m => ({ default: m.FabricSwatchCanvas })), { ssr: false });
 const FurnitureViewerCanvas = dynamic(() => import("@/components/r3f/FurnitureViewerCanvas").then(m => ({ default: m.FurnitureViewerCanvas })), { ssr: false });
 
 const FABRICS = [
@@ -78,20 +77,18 @@ export function FabricShowcase() {
                     boxShadow: activeFabric === fabric.id ? "var(--shadow-warm)" : "none",
                   }}
                 >
-                  {/* Swatch — 3D breathing fabric for active, static for others */}
-                  <div className="aspect-square w-full">
-                    {desktop && inView && activeFabric === fabric.id ? (
-                      <FabricSwatchCanvas fabricId={fabric.id} />
-                    ) : (
-                      <div className="relative h-full w-full overflow-hidden">
-                        <Image
-                          src={fabric.preview}
-                          alt={fabric.name}
-                          fill
-                          className="object-cover transition-transform duration-[3s] group-hover:scale-110"
-                          sizes="200px"
-                        />
-                      </div>
+                  {/* Swatch — static image with hover zoom */}
+                  <div className="aspect-square w-full relative overflow-hidden">
+                    <Image
+                      src={fabric.preview}
+                      alt={fabric.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="200px"
+                    />
+                    {/* Active indicator pulse */}
+                    {activeFabric === fabric.id && (
+                      <div className="absolute inset-0 border-2 border-[var(--color-primary)]/30 rounded-2xl animate-pulse" />
                     )}
                   </div>
                 </div>
