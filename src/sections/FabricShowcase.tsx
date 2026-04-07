@@ -7,12 +7,13 @@ import { useIsDesktop } from "@/lib/animations";
 import Image from "next/image";
 
 // Lazy load R3F canvases — no SSR
+const FabricSwatchCanvas = dynamic(() => import("@/components/r3f/FabricSwatchCanvas").then(m => ({ default: m.FabricSwatchCanvas })), { ssr: false });
 const FurnitureViewerCanvas = dynamic(() => import("@/components/r3f/FurnitureViewerCanvas").then(m => ({ default: m.FurnitureViewerCanvas })), { ssr: false });
 
 const FABRICS = [
-  { id: "velvet", name: "Велюр", color: "#8B6544", preview: "/textures/velvet-warm.jpg" },
-  { id: "leather", name: "Кожа", color: "#A0937D", preview: "/textures/leather-cognac.jpg" },
-  { id: "linen", name: "Лён", color: "#C4B49A", preview: "/textures/fabric-swatches.jpg" },
+  { id: "velvet", name: "Велюр", color: "#8B6544", preview: "/models/fabric-textures/velvet/color.jpg" },
+  { id: "leather", name: "Кожа", color: "#A0937D", preview: "/models/fabric-textures/leather/color.jpg" },
+  { id: "linen", name: "Лён", color: "#C4B49A", preview: "/models/fabric-textures/linen/color.jpg" },
 ] as const;
 
 type FabricId = typeof FABRICS[number]["id"];
@@ -77,31 +78,21 @@ export function FabricShowcase() {
                     boxShadow: activeFabric === fabric.id ? "var(--shadow-warm)" : "none",
                   }}
                 >
-                  {/* Swatch — 3D canvas on desktop, static image on mobile */}
+                  {/* Swatch — 3D breathing fabric for active, static for others */}
                   <div className="aspect-square w-full">
+                    {desktop && inView && activeFabric === fabric.id ? (
+                      <FabricSwatchCanvas fabricId={fabric.id} />
+                    ) : (
                       <div className="relative h-full w-full overflow-hidden">
-                      <Image
-                        src={fabric.preview}
-                        alt={fabric.name}
-                        fill
-                        className="object-cover transition-transform duration-[3s] group-hover:scale-110"
-                        sizes="200px"
-                      />
-                      {/* Animated fabric wave overlay */}
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          background: `repeating-linear-gradient(
-                            135deg,
-                            transparent,
-                            transparent 6px,
-                            rgba(255,255,255,0.08) 6px,
-                            rgba(255,255,255,0.08) 7px
-                          )`,
-                          animation: "shimmer 4s ease-in-out infinite",
-                        }}
-                      />
-                    </div>
+                        <Image
+                          src={fabric.preview}
+                          alt={fabric.name}
+                          fill
+                          className="object-cover transition-transform duration-[3s] group-hover:scale-110"
+                          sizes="200px"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <p

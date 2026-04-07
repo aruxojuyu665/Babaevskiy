@@ -1,9 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, useCallback } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, useTexture, OrbitControls, Environment, ContactShadows } from "@react-three/drei";
-import { EffectComposer, DepthOfField, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 
 interface FurnitureViewerCanvasProps {
@@ -12,7 +11,7 @@ interface FurnitureViewerCanvasProps {
 
 function ArmchairModel({ activeFabric }: { activeFabric: string }) {
   const { scene } = useGLTF("/models/armchair/armchair.gltf");
-  const [prevFabric, setPrevFabric] = useState(activeFabric);
+  const swappedRef = useRef<string>("");
 
   // Load fabric PBR textures
   const basePath = `/models/fabric-textures/${activeFabric}`;
@@ -22,7 +21,6 @@ function ArmchairModel({ activeFabric }: { activeFabric: string }) {
     `${basePath}/roughness.jpg`,
   ]);
 
-  // Configure texture wrapping
   useEffect(() => {
     [colorMap, normalMap, roughnessMap].forEach((t) => {
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -30,56 +28,28 @@ function ArmchairModel({ activeFabric }: { activeFabric: string }) {
     });
   }, [colorMap, normalMap, roughnessMap]);
 
-  // Find pillow material and swap textures with GSAP fade
+  // Swap pillow textures when fabric changes
   useEffect(() => {
-    if (activeFabric === prevFabric && prevFabric !== "velvet") return;
+    if (swappedRef.current === activeFabric) return;
 
-    async function swapTextures() {
-      const gsap = (await import("gsap")).default;
+    scene.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!mesh.isMesh) return;
 
-      // Find all materials named "pillow"
-      const pillowMaterials: THREE.MeshStandardMaterial[] = [];
-      scene.traverse((node) => {
-        const mesh = node as THREE.Mesh;
-        if (!mesh.isMesh) return;
-
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((mat) => {
-            if (mat.name.toLowerCase().includes("pillow")) {
-              pillowMaterials.push(mat as THREE.MeshStandardMaterial);
-            }
-          });
-        } else if (mesh.material.name.toLowerCase().includes("pillow")) {
-          pillowMaterials.push(mesh.material as THREE.MeshStandardMaterial);
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      materials.forEach((mat) => {
+        if (mat.name.toLowerCase().includes("pillow")) {
+          const stdMat = mat as THREE.MeshStandardMaterial;
+          stdMat.map = colorMap;
+          stdMat.normalMap = normalMap;
+          stdMat.roughnessMap = roughnessMap;
+          stdMat.needsUpdate = true;
         }
       });
+    });
 
-      if (pillowMaterials.length === 0) return;
-
-      // Fade out
-      for (const mat of pillowMaterials) {
-        mat.transparent = true;
-        await gsap.to(mat, { opacity: 0, duration: 0.25 });
-      }
-
-      // Swap textures
-      for (const mat of pillowMaterials) {
-        mat.map = colorMap;
-        mat.normalMap = normalMap;
-        mat.roughnessMap = roughnessMap;
-        mat.needsUpdate = true;
-      }
-
-      // Fade in
-      for (const mat of pillowMaterials) {
-        gsap.to(mat, { opacity: 1, duration: 0.25 });
-      }
-
-      setPrevFabric(activeFabric);
-    }
-
-    swapTextures();
-  }, [activeFabric, prevFabric, scene, colorMap, normalMap, roughnessMap]);
+    swappedRef.current = activeFabric;
+  }, [activeFabric, scene, colorMap, normalMap, roughnessMap]);
 
   return <primitive object={scene} scale={2} position={[0, -0.8, 0]} />;
 }
@@ -93,17 +63,33 @@ function FallbackBox({ activeFabric }: { activeFabric: string }) {
   });
 
   return (
-    <mesh ref={meshRef}>
-      <boxGeometry args={[1.2, 0.8, 1.2, 4, 4, 4]} />
-      <meshStandardMaterial color={colors[activeFabric] || "#8B6544"} roughness={0.7} />
-    </mesh>
+    <group>
+      {/* Simplified armchair shape */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <boxGeometry args={[1.2, 0.6, 1]} />
+        <meshStandardMaterial color={colors[activeFabric] || "#8B6544"} roughness={0.8} />
+      </mesh>
+      {/* Back */}
+      <mesh position={[0, 0.5, -0.45]}>
+        <boxGeometry args={[1.2, 0.5, 0.15]} />
+        <meshStandardMaterial color={colors[activeFabric] || "#8B6544"} roughness={0.8} />
+      </mesh>
+      {/* Arms */}
+      <mesh position={[-0.55, 0.2, 0]}>
+        <boxGeometry args={[0.15, 0.3, 1]} />
+        <meshStandardMaterial color={colors[activeFabric] || "#8B6544"} roughness={0.8} />
+      </mesh>
+      <mesh position={[0.55, 0.2, 0]}>
+        <boxGeometry args={[0.15, 0.3, 1]} />
+        <meshStandardMaterial color={colors[activeFabric] || "#8B6544"} roughness={0.8} />
+      </mesh>
+    </group>
   );
 }
 
 function Scene({ activeFabric }: { activeFabric: string }) {
   const [modelOk, setModelOk] = useState(true);
 
-  // Pre-check model availability
   useEffect(() => {
     fetch("/models/armchair/armchair.gltf", { method: "HEAD" })
       .then((r) => { if (!r.ok) setModelOk(false); })
@@ -112,14 +98,14 @@ function Scene({ activeFabric }: { activeFabric: string }) {
 
   return (
     <>
-      {/* Warm studio lighting */}
-      <ambientLight intensity={0.3} color="#FFF8F0" />
-      <directionalLight position={[5, 5, 5]} intensity={0.7} color="#FFF5E6" castShadow />
+      {/* Warm studio lighting — simplified */}
+      <ambientLight intensity={0.4} color="#FFF8F0" />
+      <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFF5E6" />
       <directionalLight position={[-3, 2, -2]} intensity={0.3} color="#FFF0E0" />
 
       <Environment preset="apartment" />
 
-      <ContactShadows position={[0, -0.8, 0]} opacity={0.25} scale={4} blur={2.5} color="#2C1810" />
+      <ContactShadows position={[0, -0.8, 0]} opacity={0.2} scale={4} blur={2.5} color="#2C1810" />
 
       <Suspense fallback={<FallbackBox activeFabric={activeFabric} />}>
         {modelOk ? (
@@ -137,11 +123,6 @@ function Scene({ activeFabric }: { activeFabric: string }) {
         maxPolarAngle={Math.PI / 1.8}
         minPolarAngle={Math.PI / 4}
       />
-
-      <EffectComposer>
-        <DepthOfField focusDistance={0.02} focalLength={0.05} bokehScale={3} />
-        <Vignette darkness={0.3} />
-      </EffectComposer>
     </>
   );
 }
