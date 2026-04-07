@@ -64,7 +64,7 @@ export function FabricShowcase() {
         {/* Desktop: single R3F Canvas with 5 planes */}
         {desktop && inView ? (
           <div className="relative" style={{ cursor: "grab" }}>
-            <div className="h-[380px] w-full">
+            <div className="h-[440px] w-full">
               <FabricShowcaseCanvas />
             </div>
             {/* Labels positioned under each plane */}

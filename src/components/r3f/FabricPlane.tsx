@@ -85,9 +85,10 @@ const FABRIC_CONFIGS: Record<string, FabricConfig> = {
 interface FabricPlaneProps {
   fabricId: string;
   position: [number, number, number];
+  size?: number;
 }
 
-export function FabricPlane({ fabricId, position }: FabricPlaneProps) {
+export function FabricPlane({ fabricId, position, size = 2.5 }: FabricPlaneProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const smoothMouse = useRef(new THREE.Vector2(0.5, 0.5));
   const targetMouse = useRef(new THREE.Vector2(0.5, 0.5));
@@ -134,12 +135,21 @@ export function FabricPlane({ fabricId, position }: FabricPlaneProps) {
     uniforms.uRoughnessMap.value = roughnessMap;
   }, [colorMap, normalMap, roughnessMap, uniforms]);
 
+  const debugged = useRef(false);
+
   useFrame(({ clock }) => {
     uniforms.uTime.value = clock.elapsedTime;
 
     // Smooth lerp mouse position
     smoothMouse.current.lerp(targetMouse.current, 0.08);
     uniforms.uMouse.value.copy(smoothMouse.current);
+
+    // One-time debug
+    if (!debugged.current && clock.elapsedTime > 1) {
+      debugged.current = true;
+      const geo = meshRef.current?.geometry as unknown as { parameters?: { widthSegments?: number } };
+      console.log(`[FabricPlane ${fabricId}] uTime=${uniforms.uTime.value.toFixed(2)} uWaveAmp=${uniforms.uWaveAmp.value} uHover=${uniforms.uHover.value} segments=${geo?.parameters?.widthSegments ?? '?'}`);
+    }
   });
 
   function handlePointerMove(e: THREE.Intersection) {
@@ -171,7 +181,7 @@ export function FabricPlane({ fabricId, position }: FabricPlaneProps) {
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >
-      <planeGeometry args={[2.5, 2.5, 64, 64]} />
+      <planeGeometry args={[size, size, 64, 64]} />
       <shaderMaterial
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
