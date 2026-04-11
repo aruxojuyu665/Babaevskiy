@@ -21,22 +21,22 @@ export default function Home() {
       <main>
         <Hero />
         <TrustBar />
-        <Transformation />
-        <Services />
+        <div className="defer-paint"><Transformation /></div>
+        <div className="defer-paint"><Services /></div>
         <SectionDivider />
-        <Pricing />
+        <div className="defer-paint"><Pricing /></div>
         <SectionDivider variant="stitch" />
-        <Cases />
+        <div className="defer-paint"><Cases /></div>
         <SectionDivider />
-        <FabricShowcase />
+        <div className="defer-paint"><FabricShowcase /></div>
         <SectionDivider variant="stitch" />
-        <Process />
-        <About />
+        <div className="defer-paint"><Process /></div>
+        <div className="defer-paint"><About /></div>
         <SectionDivider variant="stitch" />
-        <Reviews />
+        <div className="defer-paint"><Reviews /></div>
         <SectionDivider />
-        <Calculator />
-        <Contacts />
+        <div className="defer-paint"><Calculator /></div>
+        <div className="defer-paint"><Contacts /></div>
       </main>
       <Footer />
     </>

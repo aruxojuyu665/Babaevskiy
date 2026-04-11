@@ -1,21 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function WarmCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const pos = useRef({ x: -100, y: -100 });
   const target = useRef({ x: -100, y: -100 });
-  const isTouch = useRef(false);
   const hoverScale = useRef(1);
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    // Skip on touch devices
-    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) {
-      isTouch.current = true;
-      return;
-    }
+    if (typeof window === "undefined") return;
+    // Only enable custom cursor on devices with fine pointer AND no reduced-motion preference.
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduced) return;
+    setEnabled(true);
 
     function onMouseMove(e: MouseEvent) {
       target.current = { x: e.clientX, y: e.clientY };
@@ -64,8 +65,7 @@ export function WarmCursor() {
     };
   }, []);
 
-  // Don't render on touch devices (SSR-safe)
-  if (isTouch.current) return null;
+  if (!enabled) return null;
 
   return (
     <>

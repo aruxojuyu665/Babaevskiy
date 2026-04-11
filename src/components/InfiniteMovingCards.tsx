@@ -25,22 +25,28 @@ export function InfiniteMovingCards({
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
+  const [duration, setDuration] = useState("60s");
 
   useEffect(() => {
     if (!scrollRef.current || !containerRef.current) return;
 
-    // Duplicate items for seamless loop
+    // Measure one copy of the track before duplicating so duration scales
+    // with total content width — otherwise adding cards speeds things up.
     const scrollContent = scrollRef.current;
+    const originalWidth = scrollContent.scrollWidth;
+
+    // Duplicate items for seamless loop
     const items = Array.from(scrollContent.children);
     items.forEach((item) => {
       const clone = item.cloneNode(true);
       scrollContent.appendChild(clone);
     });
 
+    const pxPerSec = speed === "slow" ? 25 : speed === "fast" ? 90 : 50;
+    setDuration(`${Math.round(originalWidth / pxPerSec)}s`);
     setStarted(true);
-  }, []);
+  }, [speed]);
 
-  const duration = speed === "slow" ? "60s" : speed === "fast" ? "20s" : "35s";
   const dir = direction === "left" ? "normal" : "reverse";
 
   return (

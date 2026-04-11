@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // Thread path — wavy stitch line
 const THREAD_PATH = "M 20 20 C 55 4, 85 36, 120 20 C 155 4, 185 36, 220 20 C 245 10, 265 20, 280 20";
 
 // Stitch positions (parameter t along path where stitches appear)
 const STITCH_POSITIONS = [0.28, 0.5, 0.72];
+
+const SESSION_KEY = "babaevskaya:preloader-seen";
 
 interface Point {
   x: number;
@@ -31,29 +33,43 @@ function getPointOnPath(path: SVGPathElement, t: number): Point {
 export function Preloader() {
   const [phase, setPhase] = useState<"loading" | "reveal" | "done">("loading");
   const [progress, setProgress] = useState(0);
-  const [needle, setNeedle] = useState<Point>({ x: 20, y: 20, angle: 0 });
-  const [stitches, setStitches] = useState<Point[]>([]);
-  const [visibleStitches, setVisibleStitches] = useState<boolean[]>([false, false, false]);
   const pathRef = useRef<SVGPathElement>(null);
+  const stitchesRef = useRef<Point[]>([]);
   const [pathReady, setPathReady] = useState(false);
+  const [shortRun, setShortRun] = useState(false);
 
-  // Wait for SVG path to mount
+  // Wait for SVG path to mount + decide how long the preloader should run.
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const seen = window.sessionStorage.getItem(SESSION_KEY);
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const coarse = window.matchMedia("(pointer: coarse)").matches;
+      const narrow = window.matchMedia("(max-width: 768px)").matches;
+      const mobileUa = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      // Skip entirely when: already seen this session, reduced-motion preference,
+      // touch/mobile pointer, narrow viewport, or a mobile UA. The preloader is
+      // purely decorative, and it would otherwise gate LCP on mobile.
+      if (seen || reduced || coarse || narrow || mobileUa) {
+        setPhase("done");
+        return;
+      }
+      setShortRun(false);
+      window.sessionStorage.setItem(SESSION_KEY, "1");
+    }
     if (pathRef.current) {
-      setPathReady(true);
-      // Pre-calculate stitch positions
       const path = pathRef.current;
-      const pts = STITCH_POSITIONS.map((t) => getPointOnPath(path, t));
-      setStitches(pts);
+      stitchesRef.current = STITCH_POSITIONS.map((t) => getPointOnPath(path, t));
+      setPathReady(true);
     }
   }, []);
 
-  // Animate progress
+  // Animate progress via rAF — only one setState per frame
   useEffect(() => {
-    if (!pathReady) return;
+    if (!pathReady || phase === "done") return;
 
-    const duration = 2400;
+    const duration = shortRun ? 900 : 2400;
     const start = performance.now();
+    let raf: number;
 
     function tick(now: number) {
       const elapsed = now - start;
@@ -63,27 +79,24 @@ export function Preloader() {
       setProgress(eased);
 
       if (p < 1) {
-        requestAnimationFrame(tick);
+        raf = requestAnimationFrame(tick);
       } else {
         setPhase("reveal");
         setTimeout(() => setPhase("done"), 600);
       }
     }
 
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [pathReady]);
 
-  // Update needle position and stitch visibility based on progress
-  useEffect(() => {
-    if (!pathRef.current || !pathReady) return;
+  // Derive needle and stitch visibility from progress — no extra state updates
+  const needle: Point = pathRef.current && pathReady
+    ? getPointOnPath(pathRef.current, progress)
+    : { x: 20, y: 20, angle: 0 };
 
-    const path = pathRef.current;
-    const pt = getPointOnPath(path, progress);
-    setNeedle(pt);
-
-    // Show stitches when needle passes them
-    setVisibleStitches(STITCH_POSITIONS.map((t) => progress > t + 0.03));
-  }, [progress, pathReady]);
+  const stitches = stitchesRef.current;
+  const visibleStitches = STITCH_POSITIONS.map((t) => progress > t + 0.03);
 
   const pathLength = pathRef.current?.getTotalLength() ?? 320;
 
@@ -91,7 +104,7 @@ export function Preloader() {
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-[var(--bg-primary)]"
+      className="preloader-root fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-[var(--bg-primary)]"
       style={{
         opacity: phase === "reveal" ? 0 : 1,
         transition: "opacity 0.6s ease",

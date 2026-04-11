@@ -91,6 +91,26 @@ html.lenis body {
   font-family: var(--font-playfair, 'Playfair Display', Georgia, serif);
 }
 
+/* Hero LCP title — intentionally NO animation. We want the browser's LCP
+   detector to record the paint immediately at t=0. */
+.hero-title-fade {}
+
+/* Preloader: hidden in SSR output on mobile so it never gates paint / LCP
+   (client-side JS still takes it down after hydration, but this avoids the
+   window of time where it's visible before hydration runs). */
+@media (pointer: coarse), (max-width: 768px) {
+  .preloader-root { display: none !important; }
+}
+
+/* Below-fold sections: tell the browser it can skip layout + paint work for
+   offscreen content. Cuts main-thread work during initial hydration, which
+   is otherwise dominated by dozens of client components. The reserved size
+   prevents scrollbar jumping when sections are materialized on scroll. */
+.defer-paint {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 800px;
+}
+
 .font-accent {
   font-family: var(--font-cormorant, 'Cormorant Garamond', Georgia, serif);
 }
@@ -158,12 +178,20 @@ html.lenis body {
 }
 
 .animated-gradient-text {
-  background: linear-gradient(var(--gradient-angle), var(--color-primary), var(--color-accent), var(--color-dark), var(--color-primary));
+  background: linear-gradient(var(--gradient-angle), #4A2C1A, #8B6544, #3A1F10, #4A2C1A);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradient-rotate 8s ease infinite;
+}
+
+/* Run the gradient animation only on desktop-class devices. A perpetual
+   paint animation on the LCP element blocks Chrome from committing the
+   final LCP value on mobile (Lighthouse mobile score). */
+@media (hover: hover) and (pointer: fine) and (min-width: 769px) {
+  .animated-gradient-text {
+    animation: gradient-rotate 8s ease infinite;
+  }
 }
 
 @keyframes gradient-rotate {

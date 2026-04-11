@@ -5,17 +5,34 @@ import { useEffect, useRef, useState } from "react";
 export function Transformation() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [shouldMount, setShouldMount] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
 
-  // Play video when in viewport
+  // Lazy-mount the <video> element only when the section is near the viewport.
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldMount(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "400px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Play/pause video based on visibility (runs only after mount).
+  useEffect(() => {
+    if (!shouldMount) return;
     const video = videoRef.current;
     if (!video) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
         if (entry.isIntersecting) {
           video.play().catch(() => {});
         } else {
@@ -27,22 +44,45 @@ export function Transformation() {
 
     observer.observe(video);
     return () => observer.disconnect();
-  }, []);
+  }, [shouldMount]);
 
-  // Track video progress for text reveals
+  // Track video progress for text reveals (only while playing).
   useEffect(() => {
+    if (!shouldMount) return;
     const video = videoRef.current;
     if (!video) return;
 
-    function onTimeUpdate() {
-      if (video!.duration) {
-        setVideoProgress(video!.currentTime / video!.duration);
-      }
-    }
+    let rafId = 0;
+    let running = false;
 
-    video.addEventListener("timeupdate", onTimeUpdate);
-    return () => video.removeEventListener("timeupdate", onTimeUpdate);
-  }, []);
+    const tick = () => {
+      if (video.duration) {
+        setVideoProgress(video.currentTime / video.duration);
+      }
+      if (running) rafId = requestAnimationFrame(tick);
+    };
+    const onPlay = () => {
+      if (running) return;
+      running = true;
+      rafId = requestAnimationFrame(tick);
+    };
+    const onPauseOrEnd = () => {
+      running = false;
+      cancelAnimationFrame(rafId);
+    };
+
+    video.addEventListener("play", onPlay);
+    video.addEventListener("pause", onPauseOrEnd);
+    video.addEventListener("ended", onPauseOrEnd);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(rafId);
+      video.removeEventListener("play", onPlay);
+      video.removeEventListener("pause", onPauseOrEnd);
+      video.removeEventListener("ended", onPauseOrEnd);
+    };
+  }, [shouldMount]);
 
   // Determine which text to show based on video progress
   const activeText =
@@ -60,16 +100,25 @@ export function Transformation() {
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-[#1a120b]">
       <div className="relative aspect-[16/9] max-h-[85vh] w-full md:aspect-auto md:h-[85vh]">
-        {/* Video */}
-        <video
-          ref={videoRef}
-          src="/video/sofa-transform.mp4"
-          muted
-          playsInline
-          loop
-          preload="auto"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        {/* Video — lazy-mounted via IntersectionObserver. Poster shown until mount. */}
+        {shouldMount ? (
+          <video
+            ref={videoRef}
+            src="/video/sofa-transform.mp4"
+            poster="/process/workshop-hero.jpg"
+            muted
+            playsInline
+            loop
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div
+            aria-hidden
+            className="absolute inset-0 h-full w-full bg-cover bg-center"
+            style={{ backgroundImage: "url(/process/workshop-hero.jpg)" }}
+          />
+        )}
 
         {/* Dark cinematic overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a120b] via-[#1a120b]/30 to-[#1a120b]/50" />
@@ -108,8 +157,8 @@ export function Transformation() {
         {/* Progress bar */}
         <div className="absolute bottom-0 left-0 right-0 z-20 h-1 bg-white/10">
           <div
-            className="h-full bg-[var(--color-primary)] transition-all duration-300"
-            style={{ width: `${videoProgress * 100}%` }}
+            className="h-full origin-left bg-[var(--color-primary)] will-change-transform"
+            style={{ transform: `scaleX(${videoProgress})` }}
           />
         </div>
 

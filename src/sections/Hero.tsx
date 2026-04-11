@@ -5,14 +5,23 @@ import Image from "next/image";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { MagneticButton } from "@/components/MagneticButton";
-import { FabricRipple } from "@/components/FabricRipple";
 import { TextGenerateEffect } from "@/components/TextGenerateEffect";
 import { RotatingText } from "@/components/RotatingText";
+import { useIsDesktop } from "@/lib/animations";
+import dynamic from "next/dynamic";
+
+// FabricRipple is a decorative 2D canvas effect only shown on pointer:fine.
+// Lazy-loaded to avoid hydrating canvas code + rAF loops on mobile.
+const FabricRipple = dynamic(
+  () => import("@/components/FabricRipple").then((m) => ({ default: m.FabricRipple })),
+  { ssr: false }
+);
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const desktop = useIsDesktop();
 
   useEffect(() => {
     async function animate() {
@@ -74,14 +83,16 @@ export function Hero() {
       ref={sectionRef}
       className="relative flex min-h-screen items-center justify-center overflow-hidden"
     >
-      {/* Background image with parallax */}
+      {/* Background image with parallax (LCP element). */}
       <div data-hero-parallax className="absolute inset-0 scale-110">
         <Image
           src="/process/workshop-hero.jpg"
           alt="Мастерская"
           fill
           className="object-cover"
-          priority
+          sizes="100vw"
+          preload
+          loading="eager"
           quality={75}
         />
       </div>
@@ -89,10 +100,12 @@ export function Hero() {
       {/* Warm overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/80 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/90" />
 
-      {/* Fabric ripple — ткань дышит за курсором (desktop only) */}
-      <div className="absolute inset-0 hidden md:block" style={{ pointerEvents: "none" }}>
-        <FabricRipple />
-      </div>
+      {/* Fabric ripple — ткань дышит за курсором (desktop only, lazy-mounted) */}
+      {desktop && (
+        <div className="absolute inset-0 hidden md:block" style={{ pointerEvents: "none" }}>
+          <FabricRipple />
+        </div>
+      )}
 
       {/* Floating decorative elements */}
       <div className="absolute top-20 left-10 h-32 w-32 animate-[float_6s_ease-in-out_infinite] rounded-full bg-[var(--color-primary)]/[0.06] blur-2xl" />
@@ -113,10 +126,9 @@ export function Hero() {
           <div className="h-px w-8 bg-[var(--color-accent)]/50" />
         </div>
 
-        {/* Title */}
+        {/* Title — LCP element; painted immediately, subtle CSS fade only. */}
         <h1
-          data-hero-animate
-          className="font-serif text-5xl font-bold leading-tight text-[var(--text-primary)] md:text-7xl lg:text-8xl"
+          className="font-serif text-5xl font-bold leading-tight text-[var(--text-primary)] md:text-7xl lg:text-8xl hero-title-fade"
         >
           Бабаевская
           <br />

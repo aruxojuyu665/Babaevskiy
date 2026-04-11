@@ -45,3 +45,23 @@ public/video/Rotating_Sofa_Reveal*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# original (pre-optimization) image backups — keep local, don't commit
+public/**/*.orig.jpg
+public/**/*.orig.jpeg
+public/**/*.orig.png
+
+# test output
+playwright-report/
+test-results/
+.lighthouseci/
+perf-reports/
+.playwright-mcp/
+
+# local screenshot baselines (regenerate via `npm run test:visual:update`)
+/screenshots/
+/test-screenshots/
+
+# unrelated research artifact
+compass_artifact_*.md
+

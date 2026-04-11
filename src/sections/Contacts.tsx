@@ -152,7 +152,7 @@ export function Contacts() {
           {/* Map */}
           <div data-contacts-animate className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)]">
             <iframe
-              src="https://yandex.ru/map-widget/v1/?um=constructor%3A&source=constructorLink&ll=37.565478%2C55.831362&z=15&pt=37.565478%2C55.831362%2Cpm2rdm"
+              src="https://yandex.ru/map-widget/v1/?um=constructor%3A&source=constructorLink&ll=37.785926%2C55.814598&z=17&pt=37.785926%2C55.814598%2Cpm2rdm"
               width="100%"
               height="100%"
               className="min-h-[350px] lg:min-h-full"

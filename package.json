@@ -6,7 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze": "cross-env ANALYZE=true next build",
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:mobile": "playwright test --project=\"Mobile Chrome\" --project=\"Mobile Safari\"",
+    "test:visual": "playwright test tests/visual",
+    "test:visual:update": "playwright test tests/visual --update-snapshots",
+    "test:throttle": "playwright test tests/throttle",
+    "test:perf": "playwright test tests/perf",
+    "lhci": "lhci autorun --config=lighthouserc.json",
+    "size": "size-limit",
+    "perf:all": "npm run build && concurrently -k -s first \"npm:start\" \"wait-on http://localhost:3000 && npm run lhci && npm run test:e2e:mobile && npm run size\""
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -29,14 +40,24 @@
     "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@next/bundle-analyzer": "^16.2.2",
+    "@playwright/test": "^1.59.1",
+    "@size-limit/preset-app": "^11.1.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.183.1",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "playwright": "^1.59.1",
+    "sharp": "^0.34.2",
+    "size-limit": "^11.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^8.0.2"
   }
 }

@@ -32,7 +32,7 @@ export function RotatingText({
         <AnimatePresence mode="wait">
           <motion.span
             key={words[index]}
-            className="inline-block text-[var(--color-primary)]"
+            className="inline-block font-semibold text-[#4A2C1A]"
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "-100%", opacity: 0 }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { useIsDesktop } from "@/lib/animations";
 
 interface HoverDistortionProps {
@@ -8,6 +9,7 @@ interface HoverDistortionProps {
   image2: string;
   displacementImage: string;
   className?: string;
+  sizes?: string;
 }
 
 export function HoverDistortion({
@@ -15,6 +17,7 @@ export function HoverDistortion({
   image2,
   displacementImage,
   className = "",
+  sizes = "(max-width: 768px) 100vw, 50vw",
 }: HoverDistortionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const desktop = useIsDesktop();
@@ -22,13 +25,10 @@ export function HoverDistortion({
   useEffect(() => {
     if (!desktop || !containerRef.current) return;
 
-    let hoverEffect: any;
-
     async function init() {
       const HoverEffect = (await import("hover-effect")).default;
-
       if (!containerRef.current) return;
-      hoverEffect = new HoverEffect({
+      new HoverEffect({
         parent: containerRef.current,
         intensity: 0.2,
         image1,
@@ -44,7 +44,6 @@ export function HoverDistortion({
     init();
 
     return () => {
-      // hover-effect doesn't have a destroy method, remove canvas
       if (containerRef.current) {
         const canvas = containerRef.current.querySelector("canvas");
         canvas?.remove();
@@ -54,8 +53,15 @@ export function HoverDistortion({
 
   if (!desktop) {
     return (
-      <div className={className}>
-        <img src={image1} alt="" className="h-full w-full object-cover" />
+      <div className={`relative ${className}`}>
+        <Image
+          src={image1}
+          alt=""
+          fill
+          sizes={sizes}
+          className="object-cover"
+          loading="lazy"
+        />
       </div>
     );
   }

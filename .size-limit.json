@@ -1,0 +1,20 @@
+[
+  {
+    "name": "First-load JS (home)",
+    "path": ".next/static/chunks/pages/index-*.js",
+    "limit": "180 KB",
+    "gzip": true
+  },
+  {
+    "name": "App entry chunks",
+    "path": ".next/static/chunks/main-*.js",
+    "limit": "120 KB",
+    "gzip": true
+  },
+  {
+    "name": "Framework chunks",
+    "path": ".next/static/chunks/framework-*.js",
+    "limit": "140 KB",
+    "gzip": true
+  }
+]

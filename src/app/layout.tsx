@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/LenisProvider";
@@ -10,12 +10,19 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "cyrillic"],
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin", "cyrillic"],
   display: "swap",
+  // LCP element ("Бабаевская мастерская") uses this font — keep preloaded.
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 const cormorant = Cormorant_Garamond({
@@ -24,7 +31,21 @@ const cormorant = Cormorant_Garamond({
   weight: ["400", "600"],
   style: ["normal", "italic"],
   display: "swap",
+  preload: false,
+  adjustFontFallback: true,
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5efe6" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a120b" },
+  ],
+  colorScheme: "light",
+};
 
 export const metadata: Metadata = {
   title: "Перетяжка мебели в Москве — Бабаевская мастерская",
