@@ -23,8 +23,13 @@ test.describe("Lead flow — hero callback form", () => {
 
     const phoneInput = page.getByPlaceholder("+7 (___) ___-__-__").first();
     await phoneInput.waitFor({ state: "visible", timeout: 15_000 });
-    await phoneInput.fill("+7 (999) 123-45-67");
-
+    // pressSequentially fires per-character keyboard events; on WebKit this
+    // drives React's onChange more reliably than `fill` which occasionally
+    // skips state updates on controlled inputs.
+    await phoneInput.click();
+    await phoneInput.pressSequentially("9991234567", { delay: 10 });
+    // Then click the submit button using Playwright's high-level click which
+    // handles WebKit touch emulation.
     const submit = page.getByRole("button", { name: /Перезвоните мне/i });
     await submit.click();
 
@@ -53,5 +58,20 @@ test.describe("Lead flow — hero callback form", () => {
     await page.waitForTimeout(500);
     expect(apiCalls).toBe(0);
     await expect(page.getByText(/Спасибо! Перезвоним/i)).toHaveCount(0);
+  });
+
+  test("phone input formats progressively as user types", async ({ page }) => {
+    await page.route("**/api/lead", (route) => route.fulfill({ status: 200, body: "{}" }));
+    await page.goto("/");
+    await waitForPreloaderGone(page);
+    const phoneInput = page.getByPlaceholder("+7 (___) ___-__-__").first();
+    await phoneInput.waitFor({ state: "visible" });
+    await phoneInput.click();
+    await phoneInput.pressSequentially("9991234567", { delay: 20 });
+    const value = await phoneInput.inputValue();
+    expect(value, `Value after typing 10 digits: ${value}`).toMatch(/\+7\s?\(?999\)?/);
+    expect(value).toContain("123");
+    expect(value).toContain("45");
+    expect(value).toContain("67");
   });
 });

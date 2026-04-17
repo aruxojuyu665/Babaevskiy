@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 import { waitForPreloaderGone } from "../helpers/wait-ready";
+import { assertSectionOrder } from "../helpers/section-order";
+import { assertNoHorizontalOverflow } from "../helpers/overflow";
+import { scrollThroughPage } from "../helpers/scroll-all";
 
 test.describe("Scroll journey — full-page mobile walkthrough", () => {
   test("every section becomes visible without console errors or CLS > 0.1", async ({ page }) => {
@@ -48,7 +51,9 @@ test.describe("Scroll journey — full-page mobile walkthrough", () => {
     expect(sections.length).toBeGreaterThanOrEqual(5);
 
     const cls = await page.evaluate(() => (window as unknown as { __cls: number }).__cls);
-    expect(cls).toBeLessThan(0.1);
+    // eslint-disable-next-line no-console
+    console.log(`[scroll-journey] CLS during scroll = ${cls.toFixed(4)}`);
+    expect(cls, `CLS = ${cls.toFixed(4)}`).toBeLessThan(0.1);
 
     expect(consoleErrors, consoleErrors.join("\n")).toEqual([]);
   });
@@ -61,5 +66,20 @@ test.describe("Scroll journey — full-page mobile walkthrough", () => {
     await expect(heroImage).toBeVisible();
     const naturalWidth = await heroImage.evaluate((el) => (el as HTMLImageElement).naturalWidth);
     expect(naturalWidth).toBeGreaterThan(0);
+  });
+
+  test("section order matches page.tsx source of truth", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await waitForPreloaderGone(page);
+    await scrollThroughPage(page, 10, 150);
+    await assertSectionOrder(page);
+  });
+
+  test("no horizontal overflow at any scroll position", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await waitForPreloaderGone(page);
+    await assertNoHorizontalOverflow(page);
+    await scrollThroughPage(page, 10, 150);
+    await assertNoHorizontalOverflow(page);
   });
 });
