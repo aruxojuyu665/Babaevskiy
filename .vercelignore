@@ -1,0 +1,28 @@
+# Test outputs and artifacts
+test-results/
+test-screenshots/
+screenshots/
+.playwright-mcp/
+playwright-report/
+perf-reports/
+.lighthouseci/
+*.docx
+*.rar
+*.zip
+*.7z
+
+# Local docs and planning (not needed for runtime build)
+work-plan-babaevskaya.md
+SITE-DESCRIPTION.md
+compass_artifact_*.md
+claude-code-setup.md
+
+# TS build cache
+tsconfig.tsbuildinfo
+
+# Local test scripts
+test-fabric-squares.mjs
+
+# Local Claude/IDE
+.mcp.json
+.claude/

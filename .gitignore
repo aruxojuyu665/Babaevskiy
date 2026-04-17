@@ -65,3 +65,19 @@ perf-reports/
 # unrelated research artifact
 compass_artifact_*.md
 
+# debug screenshots / reports from local sessions (regenerate via tests/tools)
+/*.png
+/*.jpg
+/*.jpeg
+/lhci-*.json
+/new_images/
+
+# Claude Code local plugin config
+/.claude/
+
+# archives / docs — keep local, don't commit
+*.rar
+*.zip
+*.7z
+*.docx
+*.pdf
