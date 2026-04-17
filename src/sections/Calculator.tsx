@@ -1,19 +1,90 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
 
 const FURNITURE_TYPES = [
-  "Диван прямой",
-  "Диван угловой",
-  "Кресло",
-  "Стул",
-  "Кухонный уголок",
-  "Кровать",
-  "Пуф",
-  "Другое",
+  {
+    name: "Диван прямой",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3" />
+        <path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z" />
+        <path d="M4 18v2" /><path d="M20 18v2" />
+      </svg>
+    ),
+  },
+  {
+    name: "Диван угловой",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21V10a2 2 0 0 1 2-2h8v13" />
+        <path d="M13 13h8a2 2 0 0 1 2 2v6" />
+        <path d="M3 21h20" />
+      </svg>
+    ),
+  },
+  {
+    name: "Кресло",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 9V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4" />
+        <path d="M4 11v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5a1 1 0 0 0-2 0v3H6v-3a1 1 0 0 0-2 0z" />
+        <path d="M7 17v3M17 17v3" />
+      </svg>
+    ),
+  },
+  {
+    name: "Стул",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 3v9h8V3" />
+        <path d="M6 12h12" />
+        <path d="M8 12v9M16 12v9" />
+      </svg>
+    ),
+  },
+  {
+    name: "Кухонный уголок",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 14V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6" />
+        <path d="M3 20v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4" />
+        <path d="M6 20v2M18 20v2" />
+      </svg>
+    ),
+  },
+  {
+    name: "Кровать",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 10v8M22 10v8" />
+        <path d="M2 14h20" />
+        <path d="M4 14V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6" />
+        <path d="M8 10h4" />
+      </svg>
+    ),
+  },
+  {
+    name: "Пуф",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <ellipse cx="12" cy="10" rx="8" ry="4" />
+        <path d="M4 10v4a8 4 0 0 0 16 0v-4" />
+      </svg>
+    ),
+  },
+  {
+    name: "Другое",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
+      </svg>
+    ),
+  },
 ] as const;
 
 export function Calculator() {
@@ -28,27 +99,6 @@ export function Calculator() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    async function animate() {
-      const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
-
-      const ctx = gsap.context(() => {
-        gsap.from("[data-calc-animate]", {
-          y: 30,
-          opacity: 0,
-          duration: 0.7,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: ref.current, start: "top 80%" },
-        });
-      }, ref);
-      return () => ctx.revert();
-    }
-    animate();
-  }, []);
 
   function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, phone: formatPhone(e.target.value) });
@@ -90,47 +140,111 @@ export function Calculator() {
     return (
       <section id="calculator" ref={ref} className="section-padding bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="rounded-[var(--radius-lg)] border border-[var(--color-primary)]/20 bg-[var(--bg-surface)] p-12">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-primary)]/10">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-3xl border border-[var(--color-primary)]/30 bg-[var(--bg-surface)] p-12 shadow-[var(--shadow-warm)]"
+          >
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: "backOut" }}
+              className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-primary)] shadow-[var(--shadow-warm)]"
+            >
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <motion.polyline
+                  points="20 6 9 17 4 12"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 0.6, duration: 0.6 }}
+                />
               </svg>
-            </div>
-            <h3 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
+            </motion.div>
+            <h3 className="font-serif text-3xl font-bold text-[var(--text-primary)]">
               Заявка отправлена!
             </h3>
-            <p className="mt-3 text-base text-[var(--text-secondary)]">
+            <p className="mt-3 text-base text-[var(--text-secondary)] md:text-lg">
               Мы свяжемся с вами в ближайшее время для расчёта стоимости.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="calculator" ref={ref} className="section-padding bg-[var(--bg-primary)]">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-12 text-center" data-calc-animate>
-          <p className="mb-2 font-accent text-base italic text-[var(--color-primary)]">
+    <section id="calculator" ref={ref} className="section-padding relative overflow-hidden bg-[var(--bg-primary)]">
+      {/* Ambient glow */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 30%, rgba(212,165,116,0.12) 0%, transparent 55%)",
+        }}
+      />
+
+      <div className="relative z-10 mx-auto max-w-3xl">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-12 text-center"
+        >
+          <p className="mb-2 font-accent text-base italic text-[var(--text-accent)]">
             Бесплатный расчёт
           </p>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Узнать стоимость
           </AnimatedHeading>
-          <p className="mx-auto mt-4 max-w-lg text-base text-[var(--text-secondary)]">
+          <p className="mx-auto mt-4 max-w-lg text-base text-[var(--text-secondary)] md:text-lg">
             Оставьте заявку — мы перезвоним и рассчитаем точную стоимость
           </p>
-        </div>
+        </motion.div>
 
-        <form
+        <motion.form
           onSubmit={handleSubmit}
-          className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-warm)] md:p-10"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-warm)] md:p-10"
         >
+          {/* Furniture type picker — visual chips */}
+          <div className="mb-6">
+            <label className="mb-3 block text-base font-semibold text-[var(--text-primary)]">
+              Тип мебели
+            </label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {FURNITURE_TYPES.map((t) => {
+                const isActive = formData.furnitureType === t.name;
+                return (
+                  <motion.button
+                    key={t.name}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, furnitureType: t.name })}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-colors ${
+                      isActive
+                        ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--text-accent)]"
+                        : "border-[var(--border)] bg-white text-[var(--text-secondary)] hover:border-[var(--color-primary)]/40 hover:text-[var(--text-primary)]"
+                    }`}
+                  >
+                    {t.icon}
+                    <span className="text-xs font-medium leading-tight">
+                      {t.name}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="grid gap-5 md:grid-cols-2">
-            {/* Name */}
-            <div data-calc-animate>
-              <label className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
+            <div>
+              <label className="mb-1.5 block text-base font-medium text-[var(--text-secondary)]">
                 Ваше имя
               </label>
               <input
@@ -138,14 +252,13 @@ export function Calculator() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Иван"
-                className="w-full rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+                className="w-full rounded-full border border-[var(--border)] bg-white px-5 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
               />
             </div>
 
-            {/* Phone */}
-            <div data-calc-animate>
-              <label className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
-                Телефон <span className="text-[var(--color-primary)]">*</span>
+            <div>
+              <label className="mb-1.5 block text-base font-medium text-[var(--text-secondary)]">
+                Телефон <span className="text-[var(--text-accent)]">*</span>
               </label>
               <input
                 type="tel"
@@ -154,42 +267,25 @@ export function Calculator() {
                 placeholder="+7 (___) ___-__-__"
                 required
                 maxLength={18}
-                className="w-full rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+                className="w-full rounded-full border border-[var(--border)] bg-white px-5 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
               />
             </div>
 
-            {/* Furniture type */}
-            <div data-calc-animate className="md:col-span-2">
-              <label className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
-                Тип мебели
-              </label>
-              <select
-                value={formData.furnitureType}
-                onChange={(e) => setFormData({ ...formData, furnitureType: e.target.value })}
-                className="w-full rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-all focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-              >
-                <option value="">Выберите тип мебели</option>
-                {FURNITURE_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Photo upload */}
-            <div data-calc-animate className="md:col-span-2">
-              <label className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
+            <div className="md:col-span-2">
+              <label className="mb-1.5 block text-base font-medium text-[var(--text-secondary)]">
                 Фото мебели (до 5 файлов)
               </label>
-              <div
+              <motion.div
+                whileHover={{ scale: 1.005 }}
                 onClick={() => fileInputRef.current?.click()}
-                className="cursor-pointer rounded-[var(--radius)] border-2 border-dashed border-[var(--border)] bg-white/50 p-6 text-center transition-all hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5"
+                className="cursor-pointer rounded-2xl border-2 border-dashed border-[var(--border)] bg-white/50 p-6 text-center transition-all hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5"
               >
-                <svg className="mx-auto mb-2 h-8 w-8 text-[var(--text-muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="mx-auto mb-2 h-9 w-9 text-[var(--text-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                <p className="text-sm text-[var(--text-muted)]">
+                <p className="text-base text-[var(--text-secondary)]">
                   Нажмите или перетащите фото сюда
                 </p>
                 <input
@@ -200,31 +296,40 @@ export function Calculator() {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-              </div>
-              {files.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {files.map((f, i) => (
-                    <span
-                      key={i}
-                      className="flex items-center gap-1.5 rounded-full bg-[var(--bg-elevated)] px-3 py-1 text-xs text-[var(--text-secondary)]"
-                    >
-                      {f.name.slice(0, 20)}
-                      <button
-                        type="button"
-                        onClick={() => removeFile(i)}
-                        className="text-[var(--text-muted)] hover:text-red-500"
+              </motion.div>
+              <AnimatePresence>
+                {files.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-3 flex flex-wrap gap-2"
+                  >
+                    {files.map((f, i) => (
+                      <motion.span
+                        key={i}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="flex items-center gap-1.5 rounded-full bg-[var(--bg-elevated)] px-3 py-1 text-xs text-[var(--text-secondary)]"
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+                        {f.name.slice(0, 20)}
+                        <button
+                          type="button"
+                          onClick={() => removeFile(i)}
+                          className="text-[var(--text-muted)] hover:text-red-500"
+                        >
+                          ×
+                        </button>
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Comment */}
-            <div data-calc-animate className="md:col-span-2">
-              <label className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
+            <div className="md:col-span-2">
+              <label className="mb-1.5 block text-base font-medium text-[var(--text-secondary)]">
                 Комментарий
               </label>
               <textarea
@@ -232,19 +337,22 @@ export function Calculator() {
                 onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                 placeholder="Опишите, что нужно сделать..."
                 rows={3}
-                className="w-full resize-none rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+                className="w-full resize-none rounded-2xl border border-[var(--border)] bg-white px-5 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
               />
             </div>
           </div>
 
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
-            className="mt-6 w-full rounded-full bg-[var(--color-primary)] py-4 text-base font-medium text-white transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)] disabled:opacity-50"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            className="group relative mt-7 w-full overflow-hidden rounded-full bg-[var(--color-primary)] py-4 text-lg font-semibold text-white shadow-[var(--shadow-warm)] transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)] disabled:opacity-50"
           >
-            {loading ? "Отправка..." : "Узнать стоимость"}
-          </button>
-        </form>
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            <span className="relative">{loading ? "Отправка..." : "Узнать стоимость"}</span>
+          </motion.button>
+        </motion.form>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface RotatingTextProps {
@@ -25,14 +25,24 @@ export function RotatingText({
     return () => clearInterval(timer);
   }, [words.length, interval]);
 
+  // Reserve width of the longest word so prefix doesn't shift when word changes.
+  const longest = useMemo(
+    () => words.reduce((a, b) => (a.length >= b.length ? a : b), ""),
+    [words]
+  );
+
   return (
     <span className={className}>
       {prefix}{" "}
-      <span className="relative inline-block overflow-hidden align-bottom" style={{ minWidth: "6ch" }}>
+      <span className="relative inline-block overflow-hidden align-bottom">
+        {/* Invisible spacer fixes the rotating slot to the longest word. */}
+        <span aria-hidden className="invisible font-semibold whitespace-nowrap">
+          {longest}
+        </span>
         <AnimatePresence mode="wait">
           <motion.span
             key={words[index]}
-            className="inline-block font-semibold text-[#4A2C1A]"
+            className="absolute inset-0 inline-block font-semibold text-[#4A2C1A] whitespace-nowrap"
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "-100%", opacity: 0 }}

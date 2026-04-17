@@ -37,22 +37,30 @@ export function AnimatedHeading({
       if (!el) return;
 
       if (variant === "chars") {
-        // Characters rise from behind a mask line
+        // Characters rise from behind a mask line.
+        // Wrap words around chars so browsers break only at word boundaries
+        // (otherwise individual char spans allow mid-word line breaks).
         const split = SplitText.create(el, {
-          type: "chars",
+          type: "chars, words",
           mask: "lines",
           autoSplit: true,
+          wordsClass: "inline-block align-baseline whitespace-nowrap",
         });
 
         gsap.from(split.chars, {
           yPercent: 110,
+          // Hide chars before animation so translated glyphs can't bleed
+          // into the element below when the mask doesn't clip perfectly.
+          opacity: 0,
           duration: 0.8,
           ease: "power4.out",
           stagger: 0.02,
           delay,
           scrollTrigger: {
             trigger: el,
-            start: "top 85%",
+            // Fire as soon as any part of the heading enters the viewport so
+            // chars never sit in their translated "pre-reveal" state on screen.
+            start: "top 98%",
             once: true,
           },
         });
@@ -76,7 +84,7 @@ export function AnimatedHeading({
           delay,
           scrollTrigger: {
             trigger: el,
-            start: "top 85%",
+            start: "top 98%",
             once: true,
           },
         });
@@ -93,7 +101,13 @@ export function AnimatedHeading({
   }, [reduced, variant, delay]);
 
   return (
-    <Tag ref={ref} className={className}>
+    <Tag
+      ref={ref}
+      className={className}
+      // Clip any glyph that slips past the line mask so translated chars
+      // can't overlap the paragraph that follows the heading.
+      style={{ overflow: "clip" }}
+    >
       {children}
     </Tag>
   );

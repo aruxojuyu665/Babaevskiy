@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { BUSINESS, NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -54,10 +55,10 @@ export function Header() {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
-            className="font-serif text-xl font-bold tracking-tight text-[var(--text-primary)] md:text-2xl"
+            className="inline-flex min-h-[44px] flex-col items-center justify-center py-1 font-serif text-xl font-bold leading-none tracking-tight text-[var(--text-primary)] md:text-2xl"
           >
-            Бабаевская
-            <span className="block text-xs font-normal tracking-[0.2em] uppercase text-[var(--text-secondary)] font-sans">
+            <span className="leading-none">Бабаевская</span>
+            <span className="mt-1 text-[0.62em] font-normal tracking-[0.32em] uppercase text-[var(--text-secondary)] font-sans">
               мастерская
             </span>
           </a>
@@ -68,18 +69,18 @@ export function Header() {
               <button
                 key={link.href}
                 onClick={() => handleNavClick(link.href)}
-                className="text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--color-primary)]"
+                className="text-base font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-accent)]"
               >
                 {link.label}
               </button>
             ))}
           </nav>
 
-          {/* Desktop phone + Telegram + CTA */}
+          {/* Desktop phone + Telegram + Max + CTA */}
           <div className="hidden items-center gap-5 lg:flex">
             <a
               href={BUSINESS.phoneHref}
-              className="text-sm font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--color-primary)]"
+              className="flex min-h-[44px] items-center text-base font-bold text-[var(--text-accent)] transition-colors hover:text-[var(--color-dark)]"
             >
               {BUSINESS.phone}
             </a>
@@ -88,15 +89,24 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Telegram"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-secondary)] transition-all hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-warm-sm)]"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0088cc] text-white transition-all hover:bg-[#0077b5] hover:shadow-[var(--shadow-warm-sm)]"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
               </svg>
             </a>
+            <a
+              href={BUSINESS.max}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Max"
+              className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full transition-all hover:shadow-[var(--shadow-warm-sm)]"
+            >
+              <Image src="/max-logo.png" alt="Max" width={44} height={44} className="object-cover" />
+            </a>
             <button
               onClick={() => handleNavClick("#calculator")}
-              className="rounded-full bg-[var(--color-primary)] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm)]"
+              className="rounded-full bg-[var(--color-primary)] px-7 py-3 text-base font-semibold text-white transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm)]"
             >
               Рассчитать стоимость
             </button>
@@ -105,7 +115,7 @@ export function Header() {
           {/* Mobile burger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
+            className="relative z-50 flex h-11 w-11 flex-col items-center justify-center gap-1.5 lg:hidden"
             aria-label="Меню"
           >
             <span
@@ -144,32 +154,43 @@ export function Header() {
             <button
               key={link.href}
               onClick={() => handleNavClick(link.href)}
-              className="font-serif text-2xl font-medium text-[var(--text-primary)] transition-colors hover:text-[var(--color-primary)]"
+              className="font-serif text-2xl font-medium text-[var(--text-primary)] transition-colors hover:text-[var(--text-accent)]"
             >
               {link.label}
             </button>
           ))}
-          <div className="mt-4 flex flex-col items-center gap-4">
+          <div className="mt-4 flex flex-col items-center gap-5">
             <a
               href={BUSINESS.phoneHref}
-              className="text-lg font-semibold text-[var(--color-primary)]"
+              className="flex min-h-[44px] items-center text-xl font-bold text-[var(--text-accent)]"
             >
               {BUSINESS.phone}
             </a>
-            <a
-              href={BUSINESS.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-base text-[var(--text-secondary)] transition-colors hover:text-[var(--color-primary)]"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-              </svg>
-              Написать в Telegram
-            </a>
+            <div className="flex items-center gap-4">
+              <a
+                href={BUSINESS.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Telegram"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0088cc] text-white"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                </svg>
+              </a>
+              <a
+                href={BUSINESS.max}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Max"
+                className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full"
+              >
+                <Image src="/max-logo.png" alt="Max" width={48} height={48} className="object-cover" />
+              </a>
+            </div>
             <button
               onClick={() => handleNavClick("#calculator")}
-              className="rounded-full bg-[var(--color-primary)] px-8 py-3 text-base font-medium text-white"
+              className="rounded-full bg-[var(--color-primary)] px-10 py-4 text-lg font-semibold text-white"
             >
               Рассчитать стоимость
             </button>

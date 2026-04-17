@@ -48,7 +48,7 @@ export function Process() {
         <div className="mb-14 text-center">
           <div className="mx-auto mb-4 flex items-center justify-center gap-3">
             <div className="h-px w-12 bg-[var(--color-accent)]" />
-            <p className="font-accent text-base italic text-[var(--color-primary)]">
+            <p className="font-accent text-base italic text-[var(--text-accent)]">
               Просто и понятно
             </p>
             <div className="h-px w-12 bg-[var(--color-accent)]" />
@@ -100,19 +100,23 @@ export function Process() {
                   }}
                 >
                   <div
-                    className="flex h-14 w-14 items-center justify-center rounded-full border-2 font-serif text-lg font-bold transition-all duration-500"
+                    className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 font-serif text-lg font-bold transition-all duration-500"
                     style={{
                       borderColor: activeStep >= i ? "var(--color-primary)" : "var(--border)",
                       backgroundColor: activeStep >= i ? "var(--color-primary)" : "var(--bg-surface)",
                       color: activeStep >= i ? "white" : "var(--text-muted)",
+                      boxShadow: activeStep === i ? "0 0 0 6px rgba(196,149,106,0.2), 0 8px 24px rgba(196,149,106,0.35)" : "none",
                     }}
                   >
-                    {step.step}
+                    {activeStep === i && (
+                      <span className="absolute inset-0 animate-ping rounded-full bg-[var(--color-primary)]/30" />
+                    )}
+                    <span className="relative">{step.step}</span>
                   </div>
                   <h3 className="mt-4 text-base font-semibold text-[var(--text-primary)]">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+                  <p className="mt-2 text-base leading-relaxed text-[var(--text-secondary)]">
                     {step.description}
                   </p>
                 </div>
@@ -158,7 +162,7 @@ export function Process() {
                   {step.step}
                 </div>
                 <h3 className="text-base font-semibold text-[var(--text-primary)]">{step.title}</h3>
-                <p className="mt-1 text-sm text-[var(--text-secondary)]">{step.description}</p>
+                <p className="mt-1 text-base text-[var(--text-secondary)]">{step.description}</p>
               </div>
             ))}
           </div>

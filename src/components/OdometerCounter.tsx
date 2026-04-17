@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 interface OdometerCounterProps {
   value: number;
+  prefix?: string;
   suffix?: string;
   label: string;
 }
@@ -56,12 +57,15 @@ function SingleDigit({ digit, delay }: { digit: number; delay: number }) {
   );
 }
 
-export function OdometerCounter({ value, suffix = "", label }: OdometerCounterProps) {
+export function OdometerCounter({ value, prefix = "", suffix = "", label }: OdometerCounterProps) {
   const digits = String(value).split("").map(Number);
 
   return (
     <div className="flex flex-col items-center gap-2 px-4">
-      <div className="flex items-baseline font-serif text-3xl font-bold text-[var(--color-primary)] md:text-4xl">
+      <div className="flex items-baseline font-serif text-3xl font-bold text-[var(--text-accent)] md:text-4xl">
+        {prefix && (
+          <span className="mr-1 text-2xl md:text-3xl">{prefix}</span>
+        )}
         {digits.map((d, i) => (
           <SingleDigit key={`${i}-${d}`} digit={d} delay={i * 120} />
         ))}

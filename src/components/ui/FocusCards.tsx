@@ -14,10 +14,8 @@ export function FocusCards({ children }: FocusCardsProps) {
       {children.map((child, i) => (
         <div
           key={i}
-          className="transition-all duration-300"
+          className="h-full transition-transform duration-300"
           style={{
-            filter: hovered !== null && hovered !== i ? "blur(4px)" : "none",
-            opacity: hovered !== null && hovered !== i ? 0.5 : 1,
             transform: hovered === i ? "scale(1.02)" : "scale(1)",
           }}
           onMouseEnter={() => setHovered(i)}

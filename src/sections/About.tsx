@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
-import { TextRevealByWord } from "@/components/TextRevealByWord";
 import { BlurText } from "@/components/BlurText";
 
 export function About() {
@@ -71,13 +71,13 @@ export function About() {
           <div>
             <p
               data-about-text
-              className="mb-2 font-accent text-base italic text-[var(--color-primary)]"
+              className="mb-2 font-accent text-base italic text-[var(--text-accent)]"
             >
               О мастерской
             </p>
             <AnimatedHeading
               data-about-text
-              className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl"
+              className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl [hyphens:none] [text-wrap:balance]"
             >
               Мастерство, проверенное временем
             </AnimatedHeading>
@@ -89,18 +89,18 @@ export function About() {
                 наших мастеров прошли тысячи изделий.
               </p>
               <p>
-                В нашей команде работают специалисты с опытом от 6 до 30 лет.
+                В нашей команде работают специалисты с опытом более 30 лет.
                 Это мастера, которые посвятили своему ремеслу большую часть жизни.
                 Многие из них пришли в профессию ещё в начале 90-х и продолжают
                 развиваться в ней до сих пор.
               </p>
             </div>
 
-            {/* Quote — scroll-reveal word by word */}
+            {/* Quote — displayed immediately, no animation */}
             <div data-about-text className="mt-8 border-l-2 border-[var(--color-accent)] pl-6">
-              <TextRevealByWord
-                text="Один мастер — одно изделие. Мастер полностью ведёт работу от начала до конца и несёт личную ответственность за результат."
-              />
+              <p className="font-serif text-xl leading-relaxed text-[var(--text-primary)] md:text-2xl">
+                Один мастер — одно изделие. Мастер полностью ведёт работу от начала до конца и несёт личную ответственность за результат.
+              </p>
             </div>
 
             {/* Blur text reveal */}
@@ -110,6 +110,61 @@ export function About() {
                 className="text-base leading-relaxed text-[var(--text-secondary)]"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Workshop details — «Подробнее о мастерской» */}
+        <div className="mt-24 md:mt-32">
+          <div className="mb-10 text-center md:mb-14">
+            <div className="mx-auto mb-4 flex items-center justify-center gap-3">
+              <div className="h-px w-12 bg-[var(--color-primary)]" />
+              <p className="font-accent text-base italic text-[var(--text-accent)]">
+                наше производство
+              </p>
+              <div className="h-px w-12 bg-[var(--color-primary)]" />
+            </div>
+            <h3 className="font-serif text-3xl font-bold leading-[1.15] text-[var(--text-primary)] md:text-4xl lg:text-5xl">
+              Подробнее о мастерской
+            </h3>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)] md:text-lg">
+              Мы — мастерская полного цикла! Занимаемся перетяжкой и обивкой мебели от простого до сложного проекта. Свой цех, проверенные ткани, мастера с огромным опытом.
+            </p>
+          </div>
+
+          {/* Photo grid — real client photos */}
+          <div className="grid gap-4 md:grid-cols-3 md:gap-6">
+            {[
+              { src: "/workshop/workshop-storage.jpg", alt: "Цех мастерской", title: "Цех полного цикла", desc: "От разборки до финальной сборки", offset: false },
+              { src: "/workshop/master-sewing.jpg", alt: "Мастер за работой", title: "Мастера с опытом", desc: "От простого до сложного проекта", offset: true },
+              { src: "/workshop/fabric-rolls-v2.jpg", alt: "Более 2000 видов тканей", title: "2 000+ тканей", desc: "Всегда в наличии в мастерской", offset: false },
+            ].map((p, i) => (
+              <motion.div
+                key={p.src}
+                // Only opacity animates in — if the IntersectionObserver misses
+                // (fast scroll on content-visibility:auto ancestor), content is
+                // at least visible. clipPath:inset(100%) previously left the
+                // image permanently hidden when the trigger never fired.
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.9, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] md:aspect-[3/4] ${p.offset ? "md:mt-12" : ""}`}
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[var(--text-primary)]/85 via-[var(--text-primary)]/40 to-transparent p-5">
+                  <p className="font-serif text-lg font-bold text-white md:text-xl">
+                    {p.title}
+                  </p>
+                  <p className="mt-1 text-sm text-white/80">{p.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
