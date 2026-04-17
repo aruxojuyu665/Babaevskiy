@@ -1,68 +1,69 @@
-import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { NextResponse, type NextRequest } from "next/server";
+import { parseRequest, LeadValidationError } from "@/lib/lead/normalize";
+import { persistLead } from "@/lib/lead/persist";
+import type { Lead } from "@/lib/lead/schema";
+import { sendLeadEmail } from "@/lib/email/send";
+import { EmailConfigError } from "@/lib/email/transport";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const contentType = request.headers.get("content-type") || "";
-    let leadData: Record<string, string>;
+    const parsed = await parseRequest(request);
 
-    if (contentType.includes("multipart/form-data")) {
-      const formData = await request.formData();
-      leadData = {
-        name: formData.get("name") as string || "",
-        phone: formData.get("phone") as string || "",
-        furnitureType: formData.get("furnitureType") as string || "",
-        comment: formData.get("comment") as string || "",
-        type: formData.get("type") as string || "calculator",
-        hasPhotos: String(formData.getAll("photos").length > 0),
-      };
-    } else {
-      leadData = await request.json();
-    }
-
-    // Validate phone
-    const digits = (leadData.phone || "").replace(/\D/g, "");
-    if (digits.length !== 11 || !digits.startsWith("7")) {
-      return NextResponse.json(
-        { success: false, error: "Некорректный номер телефона" },
-        { status: 400 }
-      );
-    }
-
-    // Save lead to JSON file for future CRM migration
-    const lead = {
-      ...leadData,
-      timestamp: new Date().toISOString(),
+    const lead: Lead = {
       id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      ip: clientIp(request),
+      userAgent: request.headers.get("user-agent") ?? undefined,
+      input: parsed.input,
+      photos: parsed.photos,
     };
 
-    const leadsDir = path.join(process.cwd(), "data");
-    await fs.mkdir(leadsDir, { recursive: true });
-
-    const leadsFile = path.join(leadsDir, "leads.json");
-    let leads: unknown[] = [];
+    let persistError: unknown = null;
     try {
-      const existing = await fs.readFile(leadsFile, "utf-8");
-      leads = JSON.parse(existing);
-    } catch {
-      // File doesn't exist yet
+      await persistLead(lead);
+    } catch (e) {
+      persistError = e;
+      console.error("[lead] persist failed", e);
     }
 
-    leads.push(lead);
-    await fs.writeFile(leadsFile, JSON.stringify(leads, null, 2), "utf-8");
+    let emailError: unknown = null;
+    try {
+      await sendLeadEmail(lead);
+    } catch (e) {
+      emailError = e;
+      console.error("[lead] email failed", e);
+    }
 
-    // TODO: Send email via Resend when API key is configured
-    // const emailTo = process.env.EMAIL_TO;
-    // const resendKey = process.env.RESEND_API_KEY;
-    // if (emailTo && resendKey) { ... }
+    // Lead is considered received if ANY sink succeeded.
+    if (persistError && emailError) {
+      const message =
+        emailError instanceof EmailConfigError
+          ? emailError.message
+          : "Не удалось сохранить заявку. Свяжитесь с нами по телефону.";
+      return NextResponse.json({ success: false, error: message }, { status: 500 });
+    }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      id: lead.id,
+      persisted: !persistError,
+      emailed: !emailError,
+    });
   } catch (error: unknown) {
+    if (error instanceof LeadValidationError) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    }
     const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 }
-    );
+    console.error("[lead] route error", error);
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
+}
+
+function clientIp(request: NextRequest): string | undefined {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0]!.trim();
+  return request.headers.get("x-real-ip") ?? undefined;
 }

@@ -4,7 +4,8 @@ export const BUSINESS = {
   phoneHref: "tel:+79779773939",
   address: "Москва, Иркутская 2к4",
   email: "info@babaevskaya.ru",
-  telegram: "#", // заглушка — клиент пришлёт ссылку
+  telegram: "https://t.me/+79779773939",
+  max: "#", // VK Max — заглушка, клиент пришлёт ссылку
   workingHours: "Пн-Сб: 9:00 — 20:00",
 } as const;
 
@@ -49,23 +50,35 @@ export const SERVICES = [
 
 export const PRICING = {
   sofas: [
-    { name: "Диван прямой (2-местный)", price: "от 8 000 ₽" },
-    { name: "Диван прямой (3-местный)", price: "от 12 000 ₽" },
-    { name: "Диван угловой", price: "от 15 000 ₽" },
-    { name: "Диван-книжка", price: "от 7 000 ₽" },
+    { name: "Прямые", price: "от 2 000 ₽" },
+    { name: "Угловые", price: "от 5 800 ₽" },
+    { name: "Аккордеон", price: "от 5 000 ₽" },
+    { name: "Книжка", price: "от 4 000 ₽" },
+    { name: "Тахта", price: "от 3 500 ₽" },
+    { name: "Детский", price: "от 2 500 ₽" },
   ],
   chairs: [
-    { name: "Кресло мягкое", price: "от 5 000 ₽" },
-    { name: "Кресло-качалка", price: "от 6 000 ₽" },
-    { name: "Офисное кресло", price: "от 4 000 ₽" },
+    { name: "Домашнее", price: "от 2 900 ₽" },
+    { name: "Компьютерное", price: "от 1 100 ₽" },
+    { name: "Офисное", price: "от 1 500 ₽" },
+    { name: "Парикмахерское", price: "от 1 700 ₽" },
+    { name: "Стул", price: "от 1 600 ₽" },
+    { name: "Барный стул", price: "от 600 ₽" },
   ],
   other: [
-    { name: "Стул (сиденье)", price: "от 1 500 ₽" },
-    { name: "Стул (сиденье + спинка)", price: "от 2 500 ₽" },
-    { name: "Кухонный уголок", price: "от 6 000 ₽" },
-    { name: "Кровать (изголовье)", price: "от 5 000 ₽" },
-    { name: "Пуф", price: "от 2 000 ₽" },
+    { name: "Кухонные уголки", price: "от 2 800 ₽" },
+    { name: "Кровати", price: "от 3 200 ₽" },
+    { name: "Изголовье", price: "от 1 600 ₽" },
+    { name: "Тумбы/пуфы", price: "от 1 700 ₽" },
+    { name: "Подушки", price: "от 600 ₽" },
+    { name: "Подлокотники", price: "от 900 ₽" },
   ],
+} as const;
+
+export const PRICING_META = {
+  sofas: { icon: "sofa", note: "+ материал" },
+  chairs: { icon: "armchair", note: "+ материал" },
+  other: { icon: "pillow", note: "+ материал" },
 } as const;
 
 export const PROCESS_STEPS = [
@@ -76,8 +89,9 @@ export const PROCESS_STEPS = [
   },
   {
     step: 2,
-    title: "Осмотр",
-    description: "Мастер выезжает, оценивает состояние мебели",
+    title: "Замер",
+    description:
+      "Мастер приедет в удобное вам время, снимет размеры, посчитает стоимость и сроки",
   },
   {
     step: 3,
@@ -87,7 +101,8 @@ export const PROCESS_STEPS = [
   {
     step: 4,
     title: "Работа",
-    description: "Перетяжка в мастерской — от 3 до 7 дней",
+    description:
+      "Мастер снимет старую обивку, сошьют новую и перетянут новым материалом",
   },
   {
     step: 5,
