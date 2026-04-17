@@ -89,11 +89,11 @@ export function Hero() {
           src="/process/workshop-hero.jpg"
           alt="Мастерская"
           fill
+          priority
+          fetchPriority="high"
           className="object-cover"
-          sizes="100vw"
-          preload
-          loading="eager"
-          quality={75}
+          sizes="(max-width: 414px) 100vw, (max-width: 828px) 100vw, 100vw"
+          quality={60}
         />
       </div>
 
@@ -120,7 +120,7 @@ export function Hero() {
         {/* Tagline with decorative elements */}
         <div data-hero-animate className="mx-auto mb-4 flex items-center justify-center gap-3">
           <div className="h-px w-8 bg-[var(--color-accent)]/50" />
-          <p className="font-accent text-lg italic text-[var(--color-primary)] md:text-xl">
+          <p className="font-accent text-lg italic text-[var(--text-accent)] md:text-xl">
             Мастерская ручной работы
           </p>
           <div className="h-px w-8 bg-[var(--color-accent)]/50" />
@@ -137,17 +137,18 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Subtitle — words appear one by one after preloader */}
-        <div data-hero-animate className="mx-auto mt-6 max-w-2xl">
+        {/* Subtitle — words appear one by one after preloader. min-h reserves
+            vertical space so the CTA row below doesn't shift as words populate. */}
+        <div data-hero-animate className="mx-auto mt-6 max-w-2xl min-h-[3.5rem]">
           <TextGenerateEffect
-            text="Перетяжка мягкой мебели в Москве и МО. Один мастер — одно изделие. Опыт от 6 до 30 лет."
-            className="text-lg text-[var(--text-secondary)] md:text-xl"
+            text="Перетяжка мягкой мебели в Москве и МО. Один мастер — одно изделие. Опыт более 30 лет."
+            className="text-lg font-semibold text-[var(--text-primary)] [text-shadow:0_1px_3px_rgba(0,0,0,0.35)] md:text-xl"
             delay={2.8}
           />
         </div>
 
         {/* Rotating text */}
-        <div data-hero-animate className="mt-4">
+        <div data-hero-animate className="mt-4 min-h-[1.75rem]">
           <RotatingText
             prefix="Мы реставрируем"
             words={["диваны", "кресла", "стулья", "пуфы", "кровати"]}
@@ -169,7 +170,7 @@ export function Hero() {
           </MagneticButton>
           <a
             href={BUSINESS.phoneHref}
-            className="flex items-center gap-2 rounded-full border-2 border-[var(--border)] px-8 py-4 text-base font-medium text-[var(--text-primary)] transition-all hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-warm-sm)]"
+            className="flex items-center gap-3 rounded-full border-2 border-[var(--color-primary)] bg-[var(--bg-primary)]/80 px-8 py-4 text-lg font-bold text-[var(--text-accent)] backdrop-blur transition-all hover:bg-[var(--color-primary)] hover:text-white hover:shadow-[var(--shadow-warm-sm)]"
           >
             <span className="relative flex h-3 w-3">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-40" />
@@ -183,7 +184,7 @@ export function Hero() {
         <div data-hero-animate className="mt-12">
           {submitted ? (
             <div className="mx-auto max-w-md rounded-2xl border border-[var(--color-primary)]/20 bg-[var(--bg-surface)]/80 p-4 backdrop-blur">
-              <p className="text-base font-medium text-[var(--color-primary)]">
+              <p className="text-base font-medium text-[var(--text-accent)]">
                 Спасибо! Перезвоним в ближайшее время.
               </p>
             </div>

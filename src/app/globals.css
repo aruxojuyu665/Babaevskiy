@@ -15,6 +15,13 @@
   --text-primary: #2C1810;
   --text-secondary: #6B5B4E;
   --text-muted: #9A8B7D;
+  /* Semantic "accent text" — the brand copper rendered dark enough to
+     pass WCAG AA (≥4.5:1) on BOTH --bg-primary (#FAF6F1) and --bg-surface
+     (#F0E8DE). #7A5432 gives 5.8:1 on bg-primary and 5.2:1 on bg-surface.
+     --color-primary (#C4956A) and --color-dark (#8B6544) remain for
+     decorative use (borders, icon strokes, hover glows, ping halos) where
+     contrast isn't a11y-critical. */
+  --text-accent: #7A5432;
 
   --border: #E0D5C8;
   --white: #FFFAF5;
@@ -104,12 +111,15 @@ html.lenis body {
 
 /* Below-fold sections: tell the browser it can skip layout + paint work for
    offscreen content. Cuts main-thread work during initial hydration, which
-   is otherwise dominated by dozens of client components. The reserved size
-   prevents scrollbar jumping when sections are materialized on scroll. */
-.defer-paint {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 800px;
-}
+   is otherwise dominated by dozens of client components. Per-section size
+   hints prevent scrollbar jumping when sections materialize on scroll.
+   `auto` keyword in contain-intrinsic-size lets Chrome cache the measured
+   height after first paint, so the estimate only matters on first scroll. */
+.defer-paint { content-visibility: auto; }
+.defer-paint-sm { contain-intrinsic-size: auto 700px; }
+.defer-paint-md { contain-intrinsic-size: auto 1200px; }
+.defer-paint-lg { contain-intrinsic-size: auto 1800px; }
+.defer-paint-xl { contain-intrinsic-size: auto 3000px; }
 
 .font-accent {
   font-family: var(--font-cormorant, 'Cormorant Garamond', Georgia, serif);
@@ -236,7 +246,7 @@ html.lenis body {
 .floating-label-group select:focus + label,
 .floating-label-group select:valid + label {
   transform: translateY(-1.6rem) scale(0.85);
-  color: var(--color-primary);
+  color: var(--text-accent);
 }
 
 .floating-label-group label {
