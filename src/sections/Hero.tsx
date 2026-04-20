@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { BUSINESS } from "@/lib/constants";
-import { formatPhone, isValidRussianPhone } from "@/lib/utils";
+import { formatPhone, isValidRussianPhone, scrollToSection } from "@/lib/utils";
 import { MagneticButton } from "@/components/MagneticButton";
 import { TextGenerateEffect } from "@/components/TextGenerateEffect";
 import { RotatingText } from "@/components/RotatingText";
@@ -112,10 +112,6 @@ export function Hero() {
       <div className="absolute bottom-40 right-10 h-40 w-40 animate-[float_8s_ease-in-out_infinite_1s] rounded-full bg-[var(--color-accent)]/[0.06] blur-2xl" />
       <div className="absolute top-1/3 right-1/4 h-24 w-24 animate-[float_7s_ease-in-out_infinite_2s] rounded-full bg-[var(--color-warm)]/[0.05] blur-xl" />
 
-      {/* Corner ornaments */}
-      <div className="absolute top-8 left-8 z-10 h-16 w-16 border-t border-l border-[var(--color-accent)]/20" />
-      <div className="absolute top-8 right-8 z-10 h-16 w-16 border-t border-r border-[var(--color-accent)]/20" />
-
       <div className="relative z-10 mx-auto max-w-5xl px-4 text-center md:px-8">
         {/* Tagline with decorative elements */}
         <div data-hero-animate className="mx-auto mb-4 flex items-center justify-center gap-3">
@@ -159,9 +155,7 @@ export function Hero() {
         {/* CTA Buttons */}
         <div data-hero-animate className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <MagneticButton
-            onClick={() => {
-              document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" });
-            }}
+            onClick={() => scrollToSection("calculator")}
             className="group relative overflow-hidden rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-medium text-white shadow-[var(--shadow-warm)] transition-all hover:shadow-[var(--shadow-warm-lg)]"
           >
             {/* Button shine effect */}
@@ -212,8 +206,8 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Scroll hint with animation */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+      {/* Scroll hint with animation — desktop only; on mobile it overlaps the callback form */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block">
         <div className="flex flex-col items-center gap-2">
           <span className="text-xs tracking-widest uppercase text-[var(--text-muted)]">листайте</span>
           <div className="h-10 w-6 rounded-full border-2 border-[var(--text-muted)]/30 p-1">

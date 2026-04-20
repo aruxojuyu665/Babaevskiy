@@ -12,30 +12,40 @@ export function Process() {
     const el = ref.current;
     if (!el) return;
 
-    let cleanup: (() => void) | undefined;
+    const DURATION_MS = 2000;
+    let rafId = 0;
+    let started = false;
+    let startedAt = 0;
 
-    async function setup() {
-      const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
+    // Ease-out cubic — fast fill at first, settles gently at the end.
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
-      if (!el) return;
-      const ctx = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: el,
-          start: "top 70%",
-          end: "bottom 30%",
-          onUpdate: (self) => {
-            setProgress(self.progress);
-          },
-        });
-      }, el as Element);
-
-      cleanup = () => ctx.revert();
+    function tick(now: number) {
+      const t = Math.min(1, (now - startedAt) / DURATION_MS);
+      setProgress(ease(t));
+      if (t < 1) rafId = requestAnimationFrame(tick);
     }
 
-    setup();
-    return () => cleanup?.();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !started) {
+            started = true;
+            startedAt = performance.now();
+            rafId = requestAnimationFrame(tick);
+            io.disconnect();
+            return;
+          }
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+
+    return () => {
+      io.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const activeStep = Math.floor(progress * PROCESS_STEPS.length);
@@ -125,38 +135,34 @@ export function Process() {
           </div>
         </div>
 
-        {/* Mobile vertical timeline */}
+        {/* Mobile vertical timeline — line passes through the centre of the
+            numbered circles (circle: 32px wide at left:0 → center x=16px;
+            line: 2px wide at left:15px → center x=16px). */}
         <div className="md:hidden">
-          <div className="relative pl-10">
-            <div className="absolute left-4 top-0 bottom-0 w-px">
+          <div className="relative">
+            <div className="absolute left-[15px] top-4 bottom-4 w-0.5">
               <div className="absolute inset-0 border-l-2 border-dashed border-[var(--border)]" />
               <div
                 className="absolute top-0 left-0 w-full border-l-2 border-[var(--color-primary)] transition-all duration-700"
-                style={{ height: `${Math.min(progress * 120, 100)}%` }}
+                style={{ height: `${Math.min(progress * 100, 100)}%` }}
               />
             </div>
 
             {PROCESS_STEPS.map((step, i) => (
               <div
                 key={step.step}
-                className="relative mb-10 last:mb-0 transition-all duration-500"
+                className="relative mb-10 last:mb-0 pl-12 transition-all duration-500"
                 style={{
                   opacity: activeStep >= i ? 1 : 0.35,
                   transform: activeStep >= i ? "translateX(0)" : "translateX(-8px)",
                 }}
               >
                 <div
-                  className="absolute -left-[26px] top-2 h-3 w-3 rotate-45 border transition-colors duration-500"
-                  style={{
-                    borderColor: "var(--color-primary)",
-                    backgroundColor: activeStep >= i ? "var(--color-primary)" : "var(--bg-surface)",
-                  }}
-                />
-                <div
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full font-serif text-sm font-bold transition-all duration-500 mb-2"
+                  className="absolute left-0 top-0 z-10 flex h-8 w-8 items-center justify-center rounded-full font-serif text-sm font-bold transition-all duration-500"
                   style={{
                     backgroundColor: activeStep >= i ? "var(--color-primary)" : "var(--bg-elevated)",
                     color: activeStep >= i ? "white" : "var(--text-muted)",
+                    boxShadow: "0 0 0 4px var(--bg-surface)",
                   }}
                 >
                   {step.step}

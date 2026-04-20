@@ -62,10 +62,6 @@ export function PhotoRequest() {
         className="absolute -bottom-40 right-0 h-[36rem] w-[36rem] rounded-full bg-[var(--color-accent)]/[0.08] blur-3xl"
       />
 
-      {/* Corner ornaments */}
-      <div className="absolute left-8 top-8 h-20 w-20 border-l border-t border-[var(--color-accent)]/40" />
-      <div className="absolute right-8 bottom-8 h-20 w-20 border-r border-b border-[var(--color-accent)]/40" />
-
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-16 px-4 md:grid-cols-[1.15fr_1fr] md:px-8">
         {/* Left — content */}
         <motion.div

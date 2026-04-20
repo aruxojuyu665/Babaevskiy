@@ -73,7 +73,7 @@ export function Corporate() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-[var(--bg-surface)] py-24 md:py-32">
+    <section id="corporate" className="relative overflow-hidden bg-[var(--bg-surface)] py-24 md:py-32">
       {/* Ambient glow */}
       <div
         className="absolute inset-0"
@@ -82,10 +82,6 @@ export function Corporate() {
             "radial-gradient(ellipse at 80% 20%, rgba(212,165,116,0.14) 0%, transparent 55%), radial-gradient(ellipse at 20% 80%, rgba(196,149,106,0.12) 0%, transparent 55%)",
         }}
       />
-
-      {/* Corner ornaments */}
-      <div className="absolute left-8 top-8 h-16 w-16 border-l border-t border-[var(--color-accent)]/40" />
-      <div className="absolute right-8 bottom-8 h-16 w-16 border-r border-b border-[var(--color-accent)]/40" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-8">
         <motion.div
