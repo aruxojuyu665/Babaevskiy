@@ -10,10 +10,27 @@ export function About() {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    async function animate() {
+    const section = ref.current;
+    if (!section) return;
+
+    let revealPlayed = false;
+    let revealCleanup: (() => void) | undefined;
+    let parallaxCleanup: (() => void) | undefined;
+    let disposed = false;
+
+    // Reveal via IntersectionObserver. ScrollTrigger's "top 75%" trigger
+    // misfires here because this section's ancestor uses
+    // `content-visibility: auto` (`.defer-paint-xl`), so ScrollTrigger
+    // measures against the 3000px intrinsic-size placeholder before the
+    // section paints. On first scroll-through the calculated trigger point
+    // is stale and the reveal never fires — the heading stays invisible
+    // until the user scrolls past and back, which forces a refresh.
+    async function playReveal() {
+      if (revealPlayed || disposed) return;
+      revealPlayed = true;
+
       const gsap = (await import("gsap")).default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
+      if (disposed || !section) return;
 
       const ctx = gsap.context(() => {
         gsap.from("[data-about-text]", {
@@ -22,30 +39,60 @@ export function About() {
           duration: 0.8,
           stagger: 0.12,
           ease: "power3.out",
-          scrollTrigger: { trigger: ref.current, start: "top 75%" },
         });
         gsap.from("[data-about-image]", {
           scale: 1.05,
           opacity: 0,
           duration: 1.2,
           ease: "power2.out",
-          scrollTrigger: { trigger: ref.current, start: "top 80%" },
         });
-        // Parallax on About image
+      }, section);
+      revealCleanup = () => ctx.revert();
+    }
+
+    // Parallax stays on ScrollTrigger — it's scrubbed, so a stale start
+    // position self-corrects as the user scrolls through the section.
+    (async () => {
+      const gsap = (await import("gsap")).default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
+      if (disposed || !section) return;
+
+      const ctx = gsap.context(() => {
         gsap.to("[data-about-image] img", {
           y: 40,
           ease: "none",
           scrollTrigger: {
-            trigger: ref.current,
+            trigger: section,
             start: "top bottom",
             end: "bottom top",
             scrub: 1,
           },
         });
-      }, ref);
-      return () => ctx.revert();
-    }
-    animate();
+      }, section);
+      parallaxCleanup = () => ctx.revert();
+    })();
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            playReveal();
+            io.disconnect();
+            return;
+          }
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px", threshold: 0.01 }
+    );
+    io.observe(section);
+
+    return () => {
+      disposed = true;
+      io.disconnect();
+      revealCleanup?.();
+      parallaxCleanup?.();
+    };
   }, []);
 
   return (
