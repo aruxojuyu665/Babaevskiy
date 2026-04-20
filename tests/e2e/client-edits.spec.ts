@@ -273,11 +273,11 @@ test.describe("Client edit #6 — Reviews support manual drag", () => {
     const count = await tracks.count();
     expect(count).toBeGreaterThanOrEqual(1);
 
-    // Helper: drag the track by `deltaX` from its center, then measure what's
-    // directly under the viewport left edge of the wrapping `.overflow-hidden`.
-    // If the wrap is broken, the pixel at that edge will be the page
-    // background (i.e., the card grid ran out), which we detect by checking
-    // that a card element exists there.
+    // Helper: drag the track by `deltaX` from its center, then assert that
+    // the track still fully covers the wrapper horizontally. If the wrap is
+    // broken, either the track's left edge drifts right of the wrapper
+    // (empty on the left) or the right edge drifts left of the wrapper
+    // (empty on the right).
     async function dragAndCheck(trackIndex: number, deltaX: number) {
       const track = tracks.nth(trackIndex);
       const wrapper = track.locator("..");
@@ -287,7 +287,7 @@ test.describe("Client edit #6 — Reviews support manual drag", () => {
 
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down();
-      // Multi-step drag so Framer Motion registers it
+      // Multi-step drag so Framer Motion registers it as a gesture.
       const steps = 20;
       for (let i = 1; i <= steps; i++) {
         await page.mouse.move(
@@ -296,41 +296,22 @@ test.describe("Client edit #6 — Reviews support manual drag", () => {
         );
       }
       await page.mouse.up();
-      await page.waitForTimeout(150);
+      // Let Framer Motion finish any momentum animation + our wrap snap.
+      await page.waitForTimeout(300);
 
-      // Sample 3 points inside the wrapper's viewport and check that each
-      // lands on a card (or a descendant of one), not on the page background.
-      const samplePoints = [
-        { x: wrapperBox.x + 20, y: wrapperBox.y + wrapperBox.height / 2 },
-        { x: wrapperBox.x + wrapperBox.width / 2, y: wrapperBox.y + wrapperBox.height / 2 },
-        { x: wrapperBox.x + wrapperBox.width - 20, y: wrapperBox.y + wrapperBox.height / 2 },
-      ];
+      const afterBox = await track.boundingBox();
+      if (!afterBox) throw new Error("track no longer on screen");
 
-      for (const pt of samplePoints) {
-        const hit = await page.evaluate(
-          ({ x, y }) => {
-            const el = document.elementFromPoint(x, y);
-            if (!el) return "no-element";
-            // Walk up looking for a review card (marked by the rounded-2xl +
-            // border class combo used in ReviewCard).
-            let cur: Element | null = el;
-            let depth = 0;
-            while (cur && depth < 20) {
-              const cls = cur.className;
-              const s = typeof cls === "string" ? cls : "";
-              if (s.includes("rounded-2xl") && s.includes("border")) return "card";
-              cur = cur.parentElement;
-              depth++;
-            }
-            return "no-card";
-          },
-          pt
-        );
-        expect(hit, `sample at ${pt.x},${pt.y}`).toBe("card");
-      }
-
-      // Reset by dragging back (or relying on auto-scroll over time)
-      await page.waitForTimeout(200);
+      // Track must still cover the wrapper horizontally — no empty space.
+      // Allow 1px of sub-pixel fuzz.
+      expect(
+        afterBox.x,
+        `track left edge should be ≤ wrapper left edge`
+      ).toBeLessThanOrEqual(wrapperBox.x + 1);
+      expect(
+        afterBox.x + afterBox.width,
+        `track right edge should be ≥ wrapper right edge`
+      ).toBeGreaterThanOrEqual(wrapperBox.x + wrapperBox.width - 1);
     }
 
     // Top row: direction="left" (auto-scrolls left). Drag RIGHT to reproduce
