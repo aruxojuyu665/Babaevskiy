@@ -17,11 +17,33 @@ const FabricRipple = dynamic(
   { ssr: false }
 );
 
+// Delay for the subtitle word-by-word reveal. The default (2.8s) is tuned to
+// uncover right as the Preloader fades away. On any device where the Preloader
+// is skipped (see Preloader.tsx) the subtitle would otherwise sit blank for
+// ~3s before animating in, which on mobile feels broken.
+const SUBTITLE_DELAY_WITH_PRELOADER = 2.8;
+const SUBTITLE_DELAY_WITHOUT_PRELOADER = 0.25;
+
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [subtitleDelay, setSubtitleDelay] = useState(SUBTITLE_DELAY_WITH_PRELOADER);
   const desktop = useIsDesktop();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Mirror Preloader.tsx skip conditions. If the preloader isn't going to
+    // run, the subtitle should reveal immediately.
+    const seen = window.sessionStorage.getItem("babaevskaya:preloader-seen");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const narrow = window.matchMedia("(max-width: 768px)").matches;
+    const mobileUa = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (seen || reduced || coarse || narrow || mobileUa) {
+      setSubtitleDelay(SUBTITLE_DELAY_WITHOUT_PRELOADER);
+    }
+  }, []);
 
   useEffect(() => {
     async function animate() {
@@ -139,7 +161,7 @@ export function Hero() {
           <TextGenerateEffect
             text="Перетяжка мягкой мебели в Москве и МО. Один мастер — одно изделие. Опыт более 30 лет."
             className="text-lg font-semibold text-[var(--text-primary)] [text-shadow:0_1px_3px_rgba(0,0,0,0.35)] md:text-xl"
-            delay={2.8}
+            delay={subtitleDelay}
           />
         </div>
 
