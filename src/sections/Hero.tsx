@@ -233,7 +233,7 @@ export function Hero() {
                   value={phone}
                   onChange={handlePhoneChange}
                   placeholder="+7 (___) ___-__-__"
-                  className="w-full rounded-full border border-[var(--border)] bg-white/70 px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none backdrop-blur transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
+                  className="w-full rounded-full border border-[var(--border)] bg-white/70 px-6 py-3.5 text-left text-base text-[var(--text-primary)] outline-none backdrop-blur transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--color-primary)]/20"
                   maxLength={18}
                 />
                 <button

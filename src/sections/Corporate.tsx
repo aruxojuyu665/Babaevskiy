@@ -213,7 +213,7 @@ export function Corporate() {
                     value={phone}
                     onChange={(e) => setPhone(formatPhone(e.target.value))}
                     placeholder="+7 (___) ___-__-__"
-                    className="flex-1 rounded-full border border-[var(--border)] bg-[var(--bg-primary)] px-6 py-4 text-center text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
+                    className="flex-1 rounded-full border border-[var(--border)] bg-[var(--bg-primary)] px-6 py-4 text-left text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
                     maxLength={18}
                   />
                   <button

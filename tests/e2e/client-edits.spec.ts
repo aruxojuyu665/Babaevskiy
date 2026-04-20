@@ -326,6 +326,40 @@ test.describe("Client edit #6 — Reviews support manual drag", () => {
   });
 });
 
+test.describe("Client edit #8 — phone input caret starts at the left", () => {
+  test("every phone input is text-align: left (caret at start, not center)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await waitForPreloaderGone(page);
+
+    const phoneInputs = page.locator('input[type="tel"]');
+    // We need to scroll through the page so every form mounts. Touch each
+    // section that owns a phone input.
+    await scrollToId(page, "services");
+    await scrollToText(page, "Подберём ткань под ваш интерьер");
+    await scrollToText(page, "Узнать стоимость");
+    await scrollToText(page, "Работаем с организациями");
+    await scrollToId(page, "contacts");
+
+    const count = await phoneInputs.count();
+    expect(count, "at least one phone input must be mounted").toBeGreaterThanOrEqual(3);
+
+    for (let i = 0; i < count; i++) {
+      const input = phoneInputs.nth(i);
+      await input.scrollIntoViewIfNeeded();
+      const align = await input.evaluate(
+        (node) => getComputedStyle(node as HTMLInputElement).textAlign
+      );
+      // "left" or "start" both put the caret at the leading edge. "center" is
+      // the bug — regardless of viewport. The old behavior used text-center
+      // on mobile only.
+      expect(align, `phone input #${i} text-align`).not.toBe("center");
+      expect(align === "left" || align === "start").toBeTruthy();
+    }
+  });
+});
+
 test.describe("Client edit #7 — Services CTA text", () => {
   test("service cards show 'Оставить заявку' (not 'Подробнее')", async ({
     page,
