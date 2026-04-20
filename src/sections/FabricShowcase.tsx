@@ -6,7 +6,11 @@ import { AnimatedHeading } from "@/components/AnimatedHeading";
 import { Lens } from "@/components/ui/Lens";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { BUSINESS } from "@/lib/constants";
+import { useAntiBot } from "@/components/AntiBot";
+import { ConsentNotice } from "@/components/ConsentNotice";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 const FABRICS = [
   { id: "velvet", name: "Велюр", desc: "Мягкий, бархатистый", preview: "/fabrics/velvet-v2.jpg" },
@@ -20,20 +24,35 @@ export function FabricShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { HoneypotField, getAntiBotPayload } = useAntiBot();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isValidRussianPhone(phone)) return;
+    if (!isValidRussianPhone(phone)) {
+      toast.error("Введите корректный номер телефона");
+      return;
+    }
     try {
-      await fetch("/api/lead", {
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, type: "fabric-samples" }),
+        body: JSON.stringify({ phone, type: "fabric-samples", ...getAntiBotPayload() }),
       });
+      const data: { success?: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        toast.error(
+          data?.error || "Не удалось отправить. Позвоните нам: " + BUSINESS.phone
+        );
+        return;
+      }
+      toast.success("Заявка принята — согласуем удобное время");
       setSubmitted(true);
       setPhone("");
     } catch {
-      alert("Ошибка отправки. Позвоните нам: " + BUSINESS.phone);
+      toast.error("Не удалось отправить. Позвоните нам: " + BUSINESS.phone);
     }
   }
 
@@ -42,13 +61,7 @@ export function FabricShowcase() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 text-center md:mb-8">
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              Более 2 000 видов тканей на выбор
-            </p>
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-          </div>
+          <SectionEyebrow>Более 2 000 видов тканей на выбор</SectionEyebrow>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Подберём ткань под ваш интерьер
           </AnimatedHeading>
@@ -58,12 +71,16 @@ export function FabricShowcase() {
         </div>
 
         {/* Fabric photo grid — Lens zoom on desktop, hover lift on mobile */}
+        <div className="relative md:contents">
         <motion.div
           className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-5 md:gap-6 md:overflow-visible md:pb-0"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
           variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } } }}
+          onScroll={() => {
+            if (!scrolled) setScrolled(true);
+          }}
         >
           {FABRICS.map((f) => (
             <motion.div
@@ -99,10 +116,38 @@ export function FabricShowcase() {
           ))}
         </motion.div>
 
+        {/* Mobile swipe hint — only before first scroll */}
+        {!scrolled && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute right-2 top-[38%] flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--color-primary)]/90 text-white shadow-[var(--shadow-warm)] md:hidden"
+            style={{ animation: "swipeHint 1.6s ease-in-out infinite" }}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </div>
+        )}
+        </div>
+
+        <p className="mt-2 text-center text-xs text-[var(--text-muted)] md:hidden">
+          <span aria-hidden>←</span> листайте для просмотра тканей{" "}
+          <span aria-hidden>→</span>
+        </p>
+
         {/* Measurer call form */}
         <div className="mx-auto mt-12 max-w-2xl rounded-3xl border border-[var(--border)] bg-[var(--bg-primary)] p-6 shadow-[var(--shadow-warm-sm)] md:p-8">
           <h3 className="mb-2 text-center font-serif text-2xl font-bold text-[var(--text-primary)] md:text-3xl">
-            Вызовите замерщика с образцами
+            Вызвать замерщика
           </h3>
           <p className="mb-6 text-center text-base text-[var(--text-secondary)] md:text-lg">
             Приедем бесплатно, покажем ткани вживую и рассчитаем стоимость
@@ -114,25 +159,29 @@ export function FabricShowcase() {
               </p>
             </div>
           ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col items-stretch gap-3 sm:flex-row"
-            >
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(formatPhone(e.target.value))}
-                placeholder="+7 (___) ___-__-__"
-                className="flex-1 rounded-full border border-[var(--border)] bg-white px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
-                maxLength={18}
-              />
-              <button
-                type="submit"
-                className="whitespace-nowrap rounded-full bg-[var(--color-primary)] px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm)]"
+            <>
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col items-stretch gap-3 sm:flex-row"
               >
-                Вызвать замерщика
-              </button>
-            </form>
+                <HoneypotField />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhone(e.target.value))}
+                  placeholder="+7 (___) ___-__-__"
+                  className="flex-1 rounded-full border border-[var(--border)] bg-white px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
+                  maxLength={18}
+                />
+                <button
+                  type="submit"
+                  className="whitespace-nowrap rounded-full bg-[var(--color-primary)] px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm)]"
+                >
+                  Вызвать замерщика
+                </button>
+              </form>
+              <ConsentNotice buttonLabel="Вызвать замерщика" />
+            </>
           )}
         </div>
       </div>

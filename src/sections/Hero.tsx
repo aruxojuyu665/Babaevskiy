@@ -7,8 +7,11 @@ import { formatPhone, isValidRussianPhone, scrollToSection } from "@/lib/utils";
 import { MagneticButton } from "@/components/MagneticButton";
 import { TextGenerateEffect } from "@/components/TextGenerateEffect";
 import { RotatingText } from "@/components/RotatingText";
+import { useAntiBot } from "@/components/AntiBot";
+import { ConsentNotice } from "@/components/ConsentNotice";
 import { useIsDesktop } from "@/lib/animations";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
 
 // FabricRipple is a decorative 2D canvas effect only shown on pointer:fine.
 // Lazy-loaded to avoid hydrating canvas code + rAF loops on mobile.
@@ -30,6 +33,7 @@ export function Hero() {
   const [submitted, setSubmitted] = useState(false);
   const [subtitleDelay, setSubtitleDelay] = useState(SUBTITLE_DELAY_WITH_PRELOADER);
   const desktop = useIsDesktop();
+  const { HoneypotField, getAntiBotPayload } = useAntiBot();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -85,18 +89,31 @@ export function Hero() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isValidRussianPhone(phone)) return;
+    if (!isValidRussianPhone(phone)) {
+      toast.error("Введите корректный номер телефона");
+      return;
+    }
 
     try {
-      await fetch("/api/lead", {
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, type: "callback" }),
+        body: JSON.stringify({ phone, type: "callback", ...getAntiBotPayload() }),
       });
+      const data: { success?: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        toast.error(
+          data?.error || "Не удалось отправить. Позвоните нам: " + BUSINESS.phone
+        );
+        return;
+      }
+      toast.success("Заявка принята — мы свяжемся с вами в ближайшее время");
       setSubmitted(true);
       setPhone("");
     } catch {
-      alert("Ошибка отправки. Позвоните нам: " + BUSINESS.phone);
+      toast.error("Не удалось отправить. Позвоните нам: " + BUSINESS.phone);
     }
   }
 
@@ -205,25 +222,29 @@ export function Hero() {
               </p>
             </div>
           ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="mx-auto flex max-w-md flex-col items-center gap-3 sm:flex-row"
-            >
-              <input
-                type="tel"
-                value={phone}
-                onChange={handlePhoneChange}
-                placeholder="+7 (___) ___-__-__"
-                className="w-full rounded-full border border-[var(--border)] bg-white/70 px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none backdrop-blur transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
-                maxLength={18}
-              />
-              <button
-                type="submit"
-                className="w-full whitespace-nowrap rounded-full bg-[var(--color-dark)] px-6 py-3.5 text-base font-medium text-white transition-all hover:bg-[var(--text-primary)] sm:w-auto"
+            <div className="mx-auto max-w-md">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col items-center gap-3 sm:flex-row"
               >
-                Перезвоните мне
-              </button>
-            </form>
+                <HoneypotField />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  placeholder="+7 (___) ___-__-__"
+                  className="w-full rounded-full border border-[var(--border)] bg-white/70 px-6 py-3.5 text-center text-base text-[var(--text-primary)] outline-none backdrop-blur transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:bg-white focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
+                  maxLength={18}
+                />
+                <button
+                  type="submit"
+                  className="w-full whitespace-nowrap rounded-full bg-[var(--color-dark)] px-6 py-3.5 text-base font-medium text-white transition-all hover:bg-[var(--text-primary)] sm:w-auto"
+                >
+                  Перезвоните мне
+                </button>
+              </form>
+              <ConsentNotice buttonLabel="Перезвоните мне" />
+            </div>
           )}
         </div>
       </div>

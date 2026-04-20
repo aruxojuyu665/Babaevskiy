@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { BUSINESS, NAV_LINKS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, scrollToSection } from "@/lib/utils";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -30,10 +30,15 @@ export function Header() {
 
   function handleNavClick(href: string) {
     setMenuOpen(false);
-    const id = href.replace("#", "");
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+    scrollToSection(href.replace("#", ""));
+  }
+
+  function handleLogoClick() {
+    const lenis = (window as unknown as { __lenis?: { scrollTo: (target: number, opts?: { duration?: number }) => void } }).__lenis;
+    if (lenis) {
+      lenis.scrollTo(0, { duration: 1.2 });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
@@ -48,20 +53,18 @@ export function Header() {
         )}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
-          {/* Logo */}
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className="inline-flex min-h-[44px] flex-col items-center justify-center py-1 font-serif text-xl font-bold leading-none tracking-tight text-[var(--text-primary)] md:text-2xl"
+          {/* Logo — scrolls to top */}
+          <button
+            type="button"
+            onClick={handleLogoClick}
+            aria-label="Бабаевская мастерская — наверх"
+            className="inline-flex min-h-[44px] cursor-pointer flex-col items-center justify-center py-1 font-serif text-xl font-bold leading-none tracking-tight text-[var(--text-primary)] md:text-2xl"
           >
             <span className="leading-none">Бабаевская</span>
             <span className="mt-1 text-[0.62em] font-normal tracking-[0.32em] uppercase text-[var(--text-secondary)] font-sans">
               мастерская
             </span>
-          </a>
+          </button>
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-8 lg:flex">
@@ -154,7 +157,7 @@ export function Header() {
             <button
               key={link.href}
               onClick={() => handleNavClick(link.href)}
-              className="font-serif text-2xl font-medium text-[var(--text-primary)] transition-colors hover:text-[var(--text-accent)]"
+              className="inline-flex min-h-[44px] items-center justify-center px-6 py-2 font-serif text-2xl font-medium text-[var(--text-primary)] transition-colors hover:text-[var(--text-accent)]"
             >
               {link.label}
             </button>

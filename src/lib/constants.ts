@@ -5,8 +5,29 @@ export const BUSINESS = {
   address: "Москва, Иркутская 2к4",
   email: "info@babaevskaya.ru",
   telegram: "https://t.me/+79779773939",
-  max: "#", // VK Max — заглушка, клиент пришлёт ссылку
+  max: "https://max.ru/u/f9LHodD0cOI_3f9ojF34fGhC-_9l3FJJEnYYWRCUQlITjlcJadHeNJHGIc4",
   workingHours: "Пн-Сб: 9:00 — 20:00",
+} as const;
+
+// Legal registry data (ЕГРИП) — source of truth for the privacy policy, footer
+// disclosure and any other compliance-facing surface. Email/phone here are the
+// public contact channels for PD-subject requests (ст. 14 ФЗ-152), not the
+// personal inbox of the individual entrepreneur.
+export const BUSINESS_LEGAL = {
+  form: "Индивидуальный предприниматель",
+  shortForm: "ИП",
+  fullName: "Салахетдинов Линар Равилевич",
+  shortName: "ИП Салахетдинов Л. Р.",
+  ogrnip: "320774600235528",
+  inn: "522037148564",
+  registrationDate: "29.06.2020",
+  registrationAuthority:
+    "Межрайонная инспекция Федеральной налоговой службы № 46 по г. Москве",
+  pdContactEmail: "info@babaevskaya.ru",
+  pdContactPhone: "+7 977 977 39 39",
+  policyEffectiveDate: "20.04.2026",
+  policyEffectiveDateHuman: "20 апреля 2026 г.",
+  policyVersion: "1.0",
 } as const;
 
 export const NAV_LINKS = [

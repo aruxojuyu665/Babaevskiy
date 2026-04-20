@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PROCESS_STEPS } from "@/lib/constants";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 
 export function Process() {
   const ref = useRef<HTMLElement>(null);
@@ -56,13 +57,7 @@ export function Process() {
 
       <div className="mx-auto max-w-6xl relative z-10">
         <div className="mb-14 text-center">
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              Просто и понятно
-            </p>
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-          </div>
+          <SectionEyebrow>Просто и понятно</SectionEyebrow>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Как мы работаем
           </AnimatedHeading>
@@ -110,7 +105,7 @@ export function Process() {
                   }}
                 >
                   <div
-                    className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 font-serif text-lg font-bold transition-all duration-500"
+                    className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 font-serif text-2xl font-bold transition-all duration-500"
                     style={{
                       borderColor: activeStep >= i ? "var(--color-primary)" : "var(--border)",
                       backgroundColor: activeStep >= i ? "var(--color-primary)" : "var(--bg-surface)",
@@ -158,7 +153,7 @@ export function Process() {
                 }}
               >
                 <div
-                  className="absolute left-0 top-0 z-10 flex h-8 w-8 items-center justify-center rounded-full font-serif text-sm font-bold transition-all duration-500"
+                  className="absolute left-0 top-0 z-10 flex h-8 w-8 items-center justify-center rounded-full font-serif text-base font-bold transition-all duration-500"
                   style={{
                     backgroundColor: activeStep >= i ? "var(--color-primary)" : "var(--bg-elevated)",
                     color: activeStep >= i ? "white" : "var(--text-muted)",

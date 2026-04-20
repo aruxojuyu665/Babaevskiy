@@ -61,6 +61,11 @@ export function Preloader() {
       stitchesRef.current = STITCH_POSITIONS.map((t) => getPointOnPath(path, t));
       setPathReady(true);
     }
+    // The animated preloader is now mounted and covering everything at z-10000.
+    // Remove the SSR cover beneath it so that when we fade out in the "reveal"
+    // phase, the Hero underneath is what comes through — not another cover.
+    const staticCover = document.getElementById("static-preloader-cover");
+    if (staticCover) staticCover.remove();
   }, []);
 
   // Animate progress via rAF — only one setState per frame

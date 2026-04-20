@@ -42,6 +42,10 @@ export function LenisProvider({ children }: LenisProviderProps) {
         autoRaf: false,
       });
       lenisRef.current = lenis;
+      // Expose globally so scrollToSection() can drive Lenis instead of
+      // calling native scrollIntoView, which conflicts with the Lenis RAF
+      // loop and lands scroll at unpredictable sections.
+      (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
       lenis.on("scroll", ScrollTrigger.update);
 
@@ -59,6 +63,7 @@ export function LenisProvider({ children }: LenisProviderProps) {
       }
       lenisRef.current?.destroy();
       lenisRef.current = null;
+      delete (window as unknown as { __lenis?: Lenis }).__lenis;
     };
   }, []);
 

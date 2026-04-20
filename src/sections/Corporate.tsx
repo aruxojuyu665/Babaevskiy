@@ -4,6 +4,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
+import { useAntiBot } from "@/components/AntiBot";
+import { ConsentNotice } from "@/components/ConsentNotice";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
+import toast from "react-hot-toast";
 
 const BENEFITS = [
   {
@@ -55,20 +59,34 @@ const BENEFITS = [
 export function Corporate() {
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const { HoneypotField, getAntiBotPayload } = useAntiBot();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isValidRussianPhone(phone)) return;
+    if (!isValidRussianPhone(phone)) {
+      toast.error("Введите корректный номер телефона");
+      return;
+    }
     try {
-      await fetch("/api/lead", {
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, type: "corporate" }),
+        body: JSON.stringify({ phone, type: "corporate", ...getAntiBotPayload() }),
       });
+      const data: { success?: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        toast.error(
+          data?.error || "Не удалось отправить. Позвоните нам: " + BUSINESS.phone
+        );
+        return;
+      }
+      toast.success("Заявка принята — мы свяжемся с вами в ближайшее время");
       setSubmitted(true);
       setPhone("");
     } catch {
-      alert("Ошибка отправки. Позвоните нам: " + BUSINESS.phone);
+      toast.error("Не удалось отправить. Позвоните нам: " + BUSINESS.phone);
     }
   }
 
@@ -91,13 +109,7 @@ export function Corporate() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="mb-12 text-center md:mb-14"
         >
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-primary)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              для организаций
-            </p>
-            <div className="h-px w-12 bg-[var(--color-primary)]" />
-          </div>
+          <SectionEyebrow lineColor="--color-primary">для организаций</SectionEyebrow>
           <h2 className="font-serif text-4xl font-bold leading-[1.15] text-[var(--text-primary)] md:text-5xl lg:text-6xl">
             Работаем с организациями
           </h2>
@@ -190,26 +202,30 @@ export function Corporate() {
                 </p>
               </div>
             ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col items-stretch gap-3 sm:flex-row"
-              >
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhone(e.target.value))}
-                  placeholder="+7 (___) ___-__-__"
-                  className="flex-1 rounded-full border border-[var(--border)] bg-[var(--bg-primary)] px-6 py-4 text-center text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
-                  maxLength={18}
-                />
-                <button
-                  type="submit"
-                  className="group relative overflow-hidden whitespace-nowrap rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-semibold text-white shadow-[var(--shadow-warm)] transition-all hover:-translate-y-0.5 hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)]"
+              <>
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col items-stretch gap-3 sm:flex-row"
                 >
-                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                  <span className="relative">Получить предложение</span>
-                </button>
-              </form>
+                  <HoneypotField />
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(formatPhone(e.target.value))}
+                    placeholder="+7 (___) ___-__-__"
+                    className="flex-1 rounded-full border border-[var(--border)] bg-[var(--bg-primary)] px-6 py-4 text-center text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 sm:text-left"
+                    maxLength={18}
+                  />
+                  <button
+                    type="submit"
+                    className="group relative overflow-hidden whitespace-nowrap rounded-full bg-[var(--color-primary)] px-8 py-4 text-base font-semibold text-white shadow-[var(--shadow-warm)] transition-all hover:-translate-y-0.5 hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)]"
+                  >
+                    <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                    <span className="relative">Получить предложение</span>
+                  </button>
+                </form>
+                <ConsentNotice buttonLabel="Получить предложение" />
+              </>
             )}
           </div>
         </motion.div>

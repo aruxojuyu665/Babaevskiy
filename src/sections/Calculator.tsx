@@ -5,6 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
+import { useAntiBot } from "@/components/AntiBot";
+import { ConsentNotice } from "@/components/ConsentNotice";
+import toast from "react-hot-toast";
 
 const FURNITURE_TYPES = [
   {
@@ -99,6 +103,7 @@ export function Calculator() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { HoneypotField, appendAntiBotToFormData } = useAntiBot();
 
   function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, phone: formatPhone(e.target.value) });
@@ -115,7 +120,10 @@ export function Calculator() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isValidRussianPhone(formData.phone)) return;
+    if (!isValidRussianPhone(formData.phone)) {
+      toast.error("Введите корректный номер телефона");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -126,11 +134,22 @@ export function Calculator() {
       body.append("comment", formData.comment);
       body.append("type", "calculator");
       files.forEach((f) => body.append("photos", f));
+      appendAntiBotToFormData(body);
 
-      await fetch("/api/lead", { method: "POST", body });
+      const res = await fetch("/api/lead", { method: "POST", body });
+      const data: { success?: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        toast.error(
+          data?.error || "Не удалось отправить. Позвоните нам: " + BUSINESS.phone
+        );
+        return;
+      }
+      toast.success("Заявка принята — мы свяжемся с вами в ближайшее время");
       setSubmitted(true);
     } catch {
-      alert("Ошибка отправки. Позвоните нам: " + BUSINESS.phone);
+      toast.error("Не удалось отправить. Позвоните нам: " + BUSINESS.phone);
     } finally {
       setLoading(false);
     }
@@ -192,9 +211,9 @@ export function Calculator() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="mb-12 text-center"
         >
-          <p className="mb-2 font-accent text-base italic text-[var(--text-accent)]">
-            Бесплатный расчёт
-          </p>
+          <div className="mb-2">
+            <SectionEyebrow withLines={false}>Бесплатный расчёт</SectionEyebrow>
+          </div>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Узнать стоимость
           </AnimatedHeading>
@@ -211,6 +230,8 @@ export function Calculator() {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-warm)] md:p-10"
         >
+          <HoneypotField />
+
           {/* Furniture type picker — visual chips */}
           <div className="mb-6">
             <label className="mb-3 block text-base font-semibold text-[var(--text-primary)]">
@@ -352,6 +373,7 @@ export function Calculator() {
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             <span className="relative">{loading ? "Отправка..." : "Узнать стоимость"}</span>
           </motion.button>
+          <ConsentNotice buttonLabel="Узнать стоимость" />
         </motion.form>
       </div>
     </section>

@@ -5,6 +5,7 @@ import { LenisProvider } from "@/components/LenisProvider";
 import { GrainOverlay } from "@/components/GrainOverlay";
 import { PreloaderClient } from "@/components/PreloaderClient";
 import { WarmCursor } from "@/components/WarmCursor";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -107,12 +108,48 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased">
+        {/* SSR-rendered solid cover — prevents Hero FOUC before the animated
+            Preloader hydrates. Same bg as the Preloader; so visually identical
+            during the 100–300 ms until React mounts. Removed by the inline
+            script below (skip paths) or by Preloader itself (active path). */}
+        <div
+          id="static-preloader-cover"
+          aria-hidden="true"
+          className="fixed inset-0 z-[9999] bg-[var(--bg-primary)]"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var s=sessionStorage.getItem('babaevskaya:preloader-seen'),m=matchMedia;var skip=s||m('(prefers-reduced-motion: reduce)').matches||m('(pointer: coarse)').matches||m('(max-width: 768px)').matches||/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(skip){var e=document.getElementById('static-preloader-cover');if(e)e.style.display='none';}}catch(e){}`,
+          }}
+        />
         <LenisProvider>
           <PreloaderClient />
           <WarmCursor />
           {children}
           <GrainOverlay />
         </LenisProvider>
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "var(--bg-primary)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border)",
+              fontSize: "15px",
+              padding: "12px 16px",
+              borderRadius: "14px",
+              boxShadow: "var(--shadow-warm)",
+            },
+            error: { iconTheme: { primary: "#C0392B", secondary: "white" } },
+            success: {
+              iconTheme: {
+                primary: "var(--color-primary)",
+                secondary: "white",
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );

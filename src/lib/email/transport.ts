@@ -1,3 +1,4 @@
+import { lookup as dnsLookup } from "node:dns";
 import nodemailer, { type Transporter } from "nodemailer";
 
 export interface SmtpConfig {
@@ -38,15 +39,23 @@ export function loadSmtpConfig(env: NodeJS.ProcessEnv = process.env): SmtpConfig
 
 let cached: Transporter | null = null;
 let cachedKey: string | null = null;
+const prewarmed = new Set<string>();
 
 export function getTransport(config: SmtpConfig): Transporter {
   const key = `${config.host}:${config.port}:${config.user}`;
   if (cached && cachedKey === key) return cached;
+  if (!prewarmed.has(config.host)) {
+    prewarmed.add(config.host);
+    dnsLookup(config.host, { family: 4 }, () => void 0);
+  }
   cached = nodemailer.createTransport({
     host: config.host,
     port: config.port,
     secure: config.port === 465,
     auth: { user: config.user, pass: config.pass },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
   });
   cachedKey = key;
   return cached;

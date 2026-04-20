@@ -6,26 +6,44 @@ import { motion } from "framer-motion";
 import { BUSINESS } from "@/lib/constants";
 import { formatPhone, isValidRussianPhone } from "@/lib/utils";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
+import { useAntiBot } from "@/components/AntiBot";
+import { ConsentNotice } from "@/components/ConsentNotice";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
+import toast from "react-hot-toast";
 
 export function Contacts() {
   const ref = useRef<HTMLElement>(null);
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const { HoneypotField, getAntiBotPayload } = useAntiBot();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isValidRussianPhone(phone)) return;
+    if (!isValidRussianPhone(phone)) {
+      toast.error("Введите корректный номер телефона");
+      return;
+    }
 
     try {
-      await fetch("/api/lead", {
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, type: "callback" }),
+        body: JSON.stringify({ phone, type: "callback", ...getAntiBotPayload() }),
       });
+      const data: { success?: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        toast.error(
+          data?.error || "Не удалось отправить. Позвоните нам: " + BUSINESS.phone
+        );
+        return;
+      }
+      toast.success("Заявка принята — скоро перезвоним");
       setSubmitted(true);
       setPhone("");
     } catch {
-      alert("Ошибка. Позвоните нам: " + BUSINESS.phone);
+      toast.error("Не удалось отправить. Позвоните нам: " + BUSINESS.phone);
     }
   }
 
@@ -39,9 +57,9 @@ export function Contacts() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="mb-12 text-center"
         >
-          <p className="mb-2 font-accent text-base italic text-[var(--text-accent)]">
-            Свяжитесь с нами
-          </p>
+          <div className="mb-2">
+            <SectionEyebrow withLines={false}>Свяжитесь с нами</SectionEyebrow>
+          </div>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Контакты
           </AnimatedHeading>
@@ -153,22 +171,26 @@ export function Contacts() {
                   Спасибо! Скоро перезвоним.
                 </p>
               ) : (
-                <form onSubmit={handleSubmit} className="flex gap-3">
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(formatPhone(e.target.value))}
-                    placeholder="+7 (___) ___-__-__"
-                    maxLength={18}
-                    className="w-full rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-                  />
-                  <button
-                    type="submit"
-                    className="shrink-0 rounded-[var(--radius)] bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition-all hover:bg-[var(--color-dark)]"
-                  >
-                    Позвоните мне
-                  </button>
-                </form>
+                <>
+                  <form onSubmit={handleSubmit} className="flex gap-3">
+                    <HoneypotField />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(formatPhone(e.target.value))}
+                      placeholder="+7 (___) ___-__-__"
+                      maxLength={18}
+                      className="w-full rounded-[var(--radius)] border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+                    />
+                    <button
+                      type="submit"
+                      className="shrink-0 rounded-[var(--radius)] bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition-all hover:bg-[var(--color-dark)]"
+                    >
+                      Позвоните мне
+                    </button>
+                  </form>
+                  <ConsentNotice buttonLabel="Позвоните мне" />
+                </>
               )}
             </div>
           </motion.div>

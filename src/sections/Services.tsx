@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SERVICES } from "@/lib/constants";
+import { scrollToSection } from "@/lib/utils";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
 import { FocusCards } from "@/components/ui/FocusCards";
 import { SquishyCard } from "@/components/SquishyCard";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 import Tilt from "react-parallax-tilt";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -60,18 +62,18 @@ function ServiceCard({ service, index }: { service: typeof SERVICES[number]; ind
     return () => observer.disconnect();
   }, [index]);
 
-  function handleOpenContacts() {
-    document.getElementById("contacts")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  function handleOpenCalculator() {
+    scrollToSection("calculator");
   }
 
   return (
     <button
       ref={cardRef}
       type="button"
-      onClick={handleOpenContacts}
+      onClick={handleOpenCalculator}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      aria-label={`${service.title} — перейти к контактам`}
+      aria-label={`${service.title} — перейти к расчёту стоимости`}
       className="group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 text-left transition-all duration-500 hover:border-[var(--color-primary)]/30 hover:shadow-[var(--shadow-warm-lg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
       style={{
         opacity: isVisible ? 1 : 0,
@@ -112,7 +114,7 @@ function ServiceCard({ service, index }: { service: typeof SERVICES[number]; ind
 
         {/* Arrow link — pinned to bottom so cards align */}
         <div className="mt-auto flex items-center gap-2 pt-5 text-base font-medium text-[var(--text-accent)] transition-all duration-300 group-hover:gap-3">
-          Подробнее
+          Оставить заявку
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
@@ -132,13 +134,7 @@ export function Services() {
       <div className="mx-auto max-w-6xl relative z-10">
         {/* Section header */}
         <div className="mb-14 text-center">
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              Что мы делаем
-            </p>
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-          </div>
+          <SectionEyebrow>Что мы делаем</SectionEyebrow>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Наши услуги
           </AnimatedHeading>
@@ -147,9 +143,7 @@ export function Services() {
         {/* Express banner — scrolls to calculator for fast booking */}
         <button
           type="button"
-          onClick={() =>
-            document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" })
-          }
+          onClick={() => scrollToSection("calculator")}
           className="group mb-10 block w-full cursor-pointer overflow-hidden rounded-3xl border border-[var(--color-primary)]/30 bg-gradient-to-br from-[var(--color-primary)]/10 via-[var(--color-accent)]/5 to-transparent p-6 text-left transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/60 hover:shadow-[var(--shadow-warm)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] md:mb-14 md:p-8"
         >
           <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">

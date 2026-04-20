@@ -4,19 +4,14 @@ import { motion } from "framer-motion";
 import { REVIEWS } from "@/lib/constants";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
 import { InfiniteMovingCards } from "@/components/InfiniteMovingCards";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 
 export function Reviews() {
   return (
     <section className="section-padding overflow-hidden bg-[var(--bg-surface)]">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center md:mb-12">
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              Отзывы клиентов
-            </p>
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-          </div>
+          <SectionEyebrow>Отзывы клиентов</SectionEyebrow>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Нам доверяют
           </AnimatedHeading>

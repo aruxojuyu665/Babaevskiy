@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
 import { BlurText } from "@/components/BlurText";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 
 export function About() {
   const ref = useRef<HTMLElement>(null);
@@ -118,7 +119,7 @@ export function About() {
           <div>
             <p
               data-about-text
-              className="mb-2 font-accent text-base italic text-[var(--text-accent)]"
+              className="mb-2 font-accent text-base italic text-[var(--text-accent)] md:text-lg lg:text-xl"
             >
               О мастерской
             </p>
@@ -163,13 +164,7 @@ export function About() {
         {/* Workshop details — «Подробнее о мастерской» */}
         <div className="mt-24 md:mt-32">
           <div className="mb-10 text-center md:mb-14">
-            <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-              <div className="h-px w-12 bg-[var(--color-primary)]" />
-              <p className="font-accent text-base italic text-[var(--text-accent)]">
-                наше производство
-              </p>
-              <div className="h-px w-12 bg-[var(--color-primary)]" />
-            </div>
+            <SectionEyebrow lineColor="--color-primary">наше производство</SectionEyebrow>
             <h3 className="font-serif text-3xl font-bold leading-[1.15] text-[var(--text-primary)] md:text-4xl lg:text-5xl">
               Подробнее о мастерской
             </h3>

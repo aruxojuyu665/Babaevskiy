@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 
 function CashIcon() {
   return (
@@ -88,13 +89,9 @@ export function Payment() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="mb-12 text-center md:mb-14"
         >
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-10 bg-[var(--color-primary)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              удобно для всех
-            </p>
-            <div className="h-px w-10 bg-[var(--color-primary)]" />
-          </div>
+          <SectionEyebrow lineColor="--color-primary" lineWidth="w-10">
+            удобно для всех
+          </SectionEyebrow>
           <h2 className="font-serif text-4xl font-bold leading-[1.15] text-[var(--text-primary)] md:text-5xl">
             Способы оплаты
           </h2>

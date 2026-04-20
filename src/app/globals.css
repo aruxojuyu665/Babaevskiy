@@ -180,6 +180,12 @@ html.lenis body {
   100% { transform: translateX(-50%); }
 }
 
+/* ===== Mobile swipe hint (horizontal carousel nudge) ===== */
+@keyframes swipeHint {
+  0%, 100% { transform: translate(0, -50%); opacity: 0.9; }
+  50%      { transform: translate(-10px, -50%); opacity: 1; }
+}
+
 /* ===== Animated gradient angle ===== */
 @property --gradient-angle {
   syntax: "<angle>";

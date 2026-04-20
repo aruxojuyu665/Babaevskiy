@@ -1,6 +1,7 @@
 "use client";
 
-import { BUSINESS, NAV_LINKS } from "@/lib/constants";
+import Link from "next/link";
+import { BUSINESS, BUSINESS_LEGAL, NAV_LINKS } from "@/lib/constants";
 
 export function Footer() {
   return (
@@ -68,8 +69,21 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Legal row — privacy policy + IP disclosure */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-white/10 pt-6 text-center text-xs opacity-50">
+          <Link
+            href="/privacy"
+            className="underline-offset-2 transition-opacity hover:underline hover:opacity-100"
+          >
+            Политика конфиденциальности
+          </Link>
+          <span className="opacity-70">
+            {BUSINESS_LEGAL.shortName} · ОГРНИП {BUSINESS_LEGAL.ogrnip} · ИНН {BUSINESS_LEGAL.inn}
+          </span>
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-12 border-t border-white/10 pt-6 text-center text-xs opacity-40">
+        <div className="mt-6 text-center text-xs opacity-40">
           <p>© {new Date().getFullYear()} {BUSINESS.name}. Все права защищены.</p>
           <a
             href="https://t.me/door2key"

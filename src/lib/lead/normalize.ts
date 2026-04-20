@@ -1,8 +1,16 @@
 import { leadInputSchema, type LeadInput, type LeadPhotoAttachment } from "./schema";
+import {
+  ANTI_BOT_HONEYPOT_FIELD,
+  ANTI_BOT_TS_FIELD,
+  parseHoneypot,
+  parseTimestamp,
+  type AntiBotSignals,
+} from "./anti-bot";
 
 export interface ParsedRequest {
   input: LeadInput;
   photos: LeadPhotoAttachment[];
+  antiBot: AntiBotSignals;
 }
 
 export class LeadValidationError extends Error {
@@ -44,14 +52,18 @@ async function parseJson(request: Request): Promise<ParsedRequest> {
   } catch {
     throw new LeadValidationError("Некорректный JSON");
   }
-  const parsed = leadInputSchema.safeParse(raw);
+
+  const antiBot = extractAntiBotFromRecord(raw);
+  const schemaInput = stripAntiBotFromRecord(raw);
+
+  const parsed = leadInputSchema.safeParse(schemaInput);
   if (!parsed.success) {
     throw new LeadValidationError(
       firstIssue(parsed.error.issues) ?? "Ошибка валидации",
       parsed.error.issues
     );
   }
-  return { input: parsed.data, photos: [] };
+  return { input: parsed.data, photos: [], antiBot };
 }
 
 async function parseMultipart(request: Request): Promise<ParsedRequest> {
@@ -59,6 +71,11 @@ async function parseMultipart(request: Request): Promise<ParsedRequest> {
   const type = (form.get("type") ?? "").toString();
 
   const photos = await extractPhotos(form);
+
+  const antiBot: AntiBotSignals = {
+    honeypot: parseHoneypot(stringOrUndefined(form.get(ANTI_BOT_HONEYPOT_FIELD))),
+    ts: parseTimestamp(stringOrUndefined(form.get(ANTI_BOT_TS_FIELD))),
+  };
 
   const raw: Record<string, unknown> = {
     type,
@@ -82,7 +99,27 @@ async function parseMultipart(request: Request): Promise<ParsedRequest> {
     );
   }
 
-  return { input: parsed.data, photos };
+  return { input: parsed.data, photos, antiBot };
+}
+
+function extractAntiBotFromRecord(raw: unknown): AntiBotSignals {
+  if (!raw || typeof raw !== "object") return {};
+  const record = raw as Record<string, unknown>;
+  return {
+    honeypot: parseHoneypot(record[ANTI_BOT_HONEYPOT_FIELD]),
+    ts: parseTimestamp(record[ANTI_BOT_TS_FIELD]),
+  };
+}
+
+function stripAntiBotFromRecord(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object") return raw;
+  // Return a shallow copy without the anti-bot fields so the Zod schema's
+  // strict discriminated union doesn't see extras.
+  const { [ANTI_BOT_HONEYPOT_FIELD]: _h, [ANTI_BOT_TS_FIELD]: _t, ...rest } =
+    raw as Record<string, unknown>;
+  void _h;
+  void _t;
+  return rest;
 }
 
 async function extractPhotos(form: FormData): Promise<LeadPhotoAttachment[]> {

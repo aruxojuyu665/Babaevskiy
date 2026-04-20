@@ -4,7 +4,9 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { CASES } from "@/lib/constants";
+import { scrollToSection } from "@/lib/utils";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 
 interface BeforeAfterSliderProps {
   before: string;
@@ -158,13 +160,7 @@ export function Cases() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="mb-12 text-center md:mb-16"
         >
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-primary)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              Наши работы
-            </p>
-            <div className="h-px w-12 bg-[var(--color-primary)]" />
-          </div>
+          <SectionEyebrow lineColor="--color-primary">Наши работы</SectionEyebrow>
           <AnimatedHeading className="font-serif text-4xl font-bold leading-[1.15] text-[var(--text-primary)] md:text-5xl lg:text-6xl">
             Было → Стало
           </AnimatedHeading>
@@ -291,7 +287,7 @@ export function Cases() {
         {/* CTA */}
         <div className="mt-12 text-center">
           <button
-            onClick={() => document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => scrollToSection("calculator")}
             className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-[var(--color-primary)] px-10 py-4 text-base font-semibold text-white shadow-[var(--shadow-warm)] transition-all hover:-translate-y-0.5 hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm-lg)] md:text-lg"
           >
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />

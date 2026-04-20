@@ -73,7 +73,7 @@ export function PhotoRequest() {
           {/* Eyebrow */}
           <div className="mb-5 flex items-center gap-3">
             <div className="h-px w-10 bg-[var(--color-primary)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
+            <p className="font-accent text-base italic text-[var(--text-accent)] md:text-lg lg:text-xl">
               быстрый расчёт
             </p>
           </div>

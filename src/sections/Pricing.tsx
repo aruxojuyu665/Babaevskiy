@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
 import { PRICING, PRICING_META } from "@/lib/constants";
+import { scrollToSection } from "@/lib/utils";
 import { AnimatedHeading } from "@/components/AnimatedHeading";
+import { SectionEyebrow } from "@/components/SectionEyebrow";
 
 type IconKey = "sofa" | "armchair" | "pillow";
 
@@ -141,13 +143,7 @@ export function Pricing() {
     <section id="pricing" className="section-padding bg-[var(--bg-surface)]">
       <div className="mx-auto max-w-6xl">
         <div className="mb-14 text-center">
-          <div className="mx-auto mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-            <p className="font-accent text-base italic text-[var(--text-accent)]">
-              Прозрачные цены
-            </p>
-            <div className="h-px w-12 bg-[var(--color-accent)]" />
-          </div>
+          <SectionEyebrow>Прозрачные цены</SectionEyebrow>
           <AnimatedHeading className="font-serif text-3xl font-bold text-[var(--text-primary)] md:text-4xl lg:text-5xl">
             Стоимость работ
           </AnimatedHeading>
@@ -185,7 +181,7 @@ export function Pricing() {
             Точную стоимость рассчитаем после замера мебели
           </p>
           <button
-            onClick={() => document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => scrollToSection("calculator")}
             className="group relative overflow-hidden rounded-full bg-[var(--color-primary)] px-10 py-4 text-base font-semibold text-white transition-all hover:bg-[var(--color-dark)] hover:shadow-[var(--shadow-warm)] md:text-lg"
           >
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
