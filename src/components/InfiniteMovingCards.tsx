@@ -82,6 +82,23 @@ function ReviewCard({ item }: { item: CardItem }) {
   );
 }
 
+// Number of times the item list is rendered back-to-back in the track.
+// Three copies give a full trackWidth of slack for manual drag in either
+// direction beyond the auto-scroll's canonical range, so the user never
+// runs out of cards when dragging against the auto-scroll direction.
+const COPIES = 3;
+
+function wrapToCanonical(v: number, w: number): number {
+  // Canonical range for x: (-2w, 0]. In this range the viewport always
+  // renders the middle copy of items. Shifting x by ±w is invisible because
+  // all COPIES contain identical cards in identical order.
+  if (w <= 0) return v;
+  let r = v;
+  while (r > 0) r -= w;
+  while (r <= -2 * w) r += w;
+  return r;
+}
+
 export function InfiniteMovingCards({
   items,
   direction = "left",
@@ -93,6 +110,7 @@ export function InfiniteMovingCards({
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const x = useMotionValue(0);
+  const initializedRef = useRef(false);
 
   const pxPerSec = speed === "slow" ? 25 : speed === "fast" ? 90 : 50;
   const dir = direction === "left" ? -1 : 1;
@@ -107,35 +125,43 @@ export function InfiniteMovingCards({
   }, []);
 
   useEffect(() => {
-    if (!trackRef.current) return;
-    // Track holds items rendered twice (see JSX). One copy's width = half.
+    const node = trackRef.current;
+    if (!node) return;
     const measure = () => {
-      if (!trackRef.current) return;
-      setTrackWidth(trackRef.current.scrollWidth / 2);
+      const w = node.scrollWidth / COPIES;
+      setTrackWidth(w);
+      // On first measurement, place x at the middle copy so both
+      // directions have a full trackWidth of drag slack.
+      if (!initializedRef.current && w > 0) {
+        x.set(-w);
+        initializedRef.current = true;
+      }
     };
     measure();
-    // Re-measure on resize (card widths respond to md: breakpoint)
     const ro = new ResizeObserver(measure);
-    ro.observe(trackRef.current);
+    ro.observe(node);
     return () => ro.disconnect();
-  }, [items]);
+  }, [items, x]);
 
   useAnimationFrame((_, delta) => {
+    // Skip entirely while dragging/hovered — writing x during Framer's pointer
+    // handling fights the drag and causes visible jitter. Normalization runs
+    // on pointer-up instead.
     if (paused || reducedMotion || !trackWidth) return;
     const step = (pxPerSec * delta) / 1000;
-    let next = x.get() + step * dir;
-    // seamless wrap — x lives in (-trackWidth, 0] when dir=-1, [0, trackWidth) when dir=1
-    if (next <= -trackWidth) next += trackWidth;
-    if (next >= trackWidth) next -= trackWidth;
+    const next = wrapToCanonical(x.get() + step * dir, trackWidth);
     x.set(next);
   });
 
-  function normalize() {
-    // clamp x back into [-trackWidth, trackWidth] so auto-scroll wraps cleanly
-    if (!trackWidth) return;
-    const v = x.get();
-    if (v <= -trackWidth) x.set(v + trackWidth);
-    else if (v >= trackWidth) x.set(v - trackWidth);
+  function handlePointerRelease() {
+    // After drag ends, fold x back into (-2W, 0]. With COPIES=3 this snap
+    // is guaranteed invisible because every copy renders identical cards.
+    if (trackWidth) {
+      const v = x.get();
+      const wrapped = wrapToCanonical(v, trackWidth);
+      if (wrapped !== v) x.set(wrapped);
+    }
+    setPaused(false);
   }
 
   return (
@@ -157,17 +183,16 @@ export function InfiniteMovingCards({
         dragElastic={0}
         dragMomentum={true}
         onPointerDown={() => setPaused(true)}
-        onPointerUp={() => {
-          normalize();
-          setPaused(false);
-        }}
-        onPointerCancel={() => setPaused(false)}
+        onPointerUp={handlePointerRelease}
+        onPointerCancel={handlePointerRelease}
         onHoverStart={() => setPaused(true)}
         onHoverEnd={() => setPaused(false)}
       >
-        {[...items, ...items].map((item, i) => (
-          <ReviewCard key={`${item.id}-${i}`} item={item} />
-        ))}
+        {Array.from({ length: COPIES }).flatMap((_, copyIdx) =>
+          items.map((item) => (
+            <ReviewCard key={`${item.id}-${copyIdx}`} item={item} />
+          ))
+        )}
       </motion.div>
     </div>
   );
